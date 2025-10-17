@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>EOL Edetabel - Discipline <?php echo htmlspecialchars($viewData['code']); ?></title>
+  <title>EOL Edetabel - <?php echo htmlspecialchars($viewData['code']); ?></title>
   <link rel="stylesheet" href="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/css/pp-app-theme.css">
 </head>
 <body>
-  <h1>Discipline: <?php echo htmlspecialchars($viewData['code']); ?></h1>
+  <h1><?php echo htmlspecialchars($viewData['code']); ?></h1>
 
   <table border="1" cellpadding="6" cellspacing="0">
     <thead>

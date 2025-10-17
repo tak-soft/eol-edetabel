@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>EOL Edetabel - Overview</title>
+  <title>EOL Edetabel</title>
   <link rel="stylesheet" href="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/css/pp-app-theme.css">
   <style>body{font-family:Arial,Helvetica,sans-serif;padding:1rem} .leader{border:1px solid #ddd;padding:1rem;margin-bottom:1rem}</style>
 </head>
 <body>
-  <h1>EOL Edetabel — Overview</h1>
+  <h1>EOL Edetabel</h1>
 
   <?php $leader = $viewData['rankings'][0] ?? null; ?>
   <?php if ($leader): ?>
     <section class="leader">
-      <h2>Leader: <?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></h2>
-      <p>Points: <?php echo htmlspecialchars((string)$leader['points']); ?></p>
+      <h2>Liider: <?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></h2>
+      <p>Punkte: <?php echo htmlspecialchars((string)$leader['points']); ?></p>
     </section>
   <?php endif; ?>
 

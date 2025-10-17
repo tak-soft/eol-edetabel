@@ -170,7 +170,7 @@ WRS punktide päring riigi põhiselt ajavahemiku kohta
 Vaikimisi tulemused viimase 30p kohta, päringuga parameetritega saab määrata soovitu ajavahemiku
 
 ```
-GET /api/exports/federationrankings/EST?fromD={now-1 month}&toD={now}
+GET /api/exports/federationrankings/EST?fromDate={now-1 month}&toDate={now}
 X-API-Key: {RankingAPIKeyForFederation}
 ```
 

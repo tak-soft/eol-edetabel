@@ -14,3 +14,15 @@ EOL edetabelisse pääsevad orienteerujad, kes on Eesti Vabariigi kodanikud ja k
 
 Lähteülesanne ja nõuded on toodud [failis](dok/viip_edetabel.md) 
 
+## Arenduse käik
+
+Ülesanne rakenduse loomiseks sai antud Copiloti agendile (GPT-5 mini). 
+Ette antud ainult nõuete dokument ja sellest alustasime.
+
+Nii lähteülesanne kui jooksvad juhised antud eesti keeles.
+
+Arenduskeskkond  PHP arenduseks ja mySQL andmebaas käsitsi installitud ja seadistatud.
+
+Tänapäeval ikka läheb suurem osa ajast keskkonna seadistamisele. Eriti kui pole PHPs mitmeid aastaid midagi teinud ja arendad uues arvutis.
+
+

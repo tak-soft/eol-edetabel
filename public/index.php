@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use Dotenv\Dotenv;
+
+// load Composer autoloader early so classes like Dotenv are available
+require_once __DIR__ . '/../vendor/autoload.php';
+
 // Basic router + server-side plain PHP templates for smoke testing.
 // In a real project use a microframework but keep this simple for now.
 
@@ -12,20 +17,59 @@ if (php_sapi_name() === 'cli-server') {
     }
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$rootEnvDir = realpath(__DIR__ . '/../');
+$rootEnvFile = $rootEnvDir . DIRECTORY_SEPARATOR . '.env';
+$configEnvDir = realpath(__DIR__ . '/../config');
+$configEnvFile = $configEnvDir ? $configEnvDir . DIRECTORY_SEPARATOR . '.env' : null;
 
-function load_sample_data(): array
-{
-    $file = __DIR__ . '/../data/sample.json';
-    if (!file_exists($file)) {
-        return ['rankings' => [], 'athletes' => []];
-    }
-    $json = file_get_contents($file);
-    $data = json_decode($json, true);
-    return is_array($data) ? $data : ['rankings' => [], 'athletes' => []];
+if (file_exists($rootEnvFile)) {
+    $dotenv = Dotenv::createImmutable($rootEnvDir);
+} elseif ($configEnvFile && file_exists($configEnvFile)) {
+    $dotenv = Dotenv::createImmutable($configEnvDir);
+} else {
+    $dotenv = Dotenv::createImmutable($rootEnvDir);
 }
+$dotenv->safeLoad();
 
-$dataStore = load_sample_data();
+// try to connect to DB; if unavailable, fall back to sample data
+$dataStore = ['rankings' => [], 'athletes' => []];
+try {
+    if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
+        $db = new Eol\Edetabel\Database($_ENV);
+        $pdo = $db->getPdo();
+
+        // Simple aggregation: select top runners by sum of RankPoints grouped by iofId
+        $stmt = $pdo->prepare('SELECT r.iofId, r.firstname, r.lastname, r.sex, SUM(ir.RankPoints) AS points FROM iofrunners r JOIN iofresults ir ON r.iofId = ir.iofId GROUP BY r.iofId ORDER BY points DESC LIMIT 100');
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        $rankings = [];
+        $place = 1;
+        foreach ($rows as $row) {
+            $rankings[] = ['place' => $place++, 'firstname' => $row['firstname'], 'lastname' => $row['lastname'], 'iofId' => (int)$row['iofId'], 'points' => (float)$row['points'], 'sex' => $row['sex']];
+        }
+
+        // athletes: map iofId -> events
+        $stmt2 = $pdo->query('SELECT ir.iofId, e.eventorId, e.nimetus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId ORDER BY e.kuupaev DESC');
+        $events = $stmt2->fetchAll();
+        $athletes = [];
+        foreach ($events as $ev) {
+            $id = (string)$ev['iofId'];
+            $athletes[$id]['firstname'] = $athletes[$id]['firstname'] ?? '';
+            $athletes[$id]['lastname'] = $athletes[$id]['lastname'] ?? '';
+            $athletes[$id]['events'][] = ['date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints']];
+        }
+
+        $dataStore = ['rankings' => $rankings, 'athletes' => $athletes];
+    }
+} catch (Throwable $e) {
+    // fallback to sample data file
+    $file = __DIR__ . '/../data/sample.json';
+    if (file_exists($file)) {
+        $json = file_get_contents($file);
+        $data = json_decode($json, true);
+        $dataStore = is_array($data) ? $data : $dataStore;
+    }
+}
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $rawPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
@@ -50,6 +94,23 @@ if (str_starts_with($path, '/api/')) {
         $limit = isset($q['limit']) ? (int)$q['limit'] : 50;
         $offset = isset($q['offset']) ? (int)$q['offset'] : 0;
 
+        // If DB is configured and discipline provided, compute using RankCalculator and edetabli_seaded
+        if (isset($pdo) && $discipline) {
+            $calc = new Eol\Edetabel\RankCalculator($pdo);
+            $setting = $calc->loadSettingByAlakood($discipline);
+            if ($setting) {
+                $rankings = $calc->computeForSetting($setting);
+                // optionally filter by sex
+                if ($sex) {
+                    $rankings = array_values(array_filter($rankings, function ($r) use ($sex) { return ($r['sex'] ?? null) === $sex; }));
+                }
+                $paged = array_slice($rankings, $offset, $limit);
+                echo json_encode(array_values($paged));
+                exit;
+            }
+        }
+
+        // fallback to sample or precomputed dataStore
         $rows = $dataStore['rankings'] ?? [];
         $filtered = array_filter($rows, function ($r) use ($discipline, $sex) {
             if ($discipline && (!isset($r['discipline']) || $r['discipline'] !== $discipline)) return false;

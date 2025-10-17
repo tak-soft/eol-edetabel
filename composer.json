@@ -1,0 +1,21 @@
+{
+    "name": "eol/edetabel",
+    "description": "EOL edetabel importer and API",
+    "type": "project",
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eol\\Edetabel\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "rankings": [
+    {"place": 1, "firstname": "Kati", "lastname": "Kask", "iofId": 1001, "points": 123.4, "discipline": "F", "sex": "WOMEN"},
+    {"place": 2, "firstname": "Mati", "lastname": "Mets", "iofId": 1002, "points": 110.2, "discipline": "F", "sex": "MEN"}
+  ],
+  "athletes": {
+    "1001": {"firstname": "Kati", "lastname": "Kask", "events": [{"date":"2025-05-01","name":"Estonian Champs","result":3600,"place":1,"points":35.6}]},
+    "1002": {"firstname": "Mati", "lastname": "Mets", "events": [{"date":"2025-06-12","name":"Tallinn Night","result":4200,"place":3,"points":20.0}]}
+  }
+}

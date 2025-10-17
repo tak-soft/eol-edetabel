@@ -39,7 +39,8 @@ try {
         $pdo = $db->getPdo();
 
         // Simple aggregation: select top runners by sum of RankPoints grouped by iofId
-        $stmt = $pdo->prepare('SELECT r.iofId, r.firstname, r.lastname, r.sex, SUM(ir.RankPoints) AS points FROM iofrunners r JOIN iofresults ir ON r.iofId = ir.iofId GROUP BY r.iofId ORDER BY points DESC LIMIT 100');
+    // Group (MEN/WOMEN) is stored per-result in iofresults; take any value (MAX) as representative
+    $stmt = $pdo->prepare('SELECT r.iofId, r.firstname, r.lastname, MAX(ir.`Group`) AS sex, SUM(ir.RankPoints) AS points FROM iofrunners r JOIN iofresults ir ON r.iofId = ir.iofId GROUP BY r.iofId ORDER BY points DESC LIMIT 100');
         $stmt->execute();
         $rows = $stmt->fetchAll();
         $rankings = [];
@@ -49,14 +50,14 @@ try {
         }
 
         // athletes: map iofId -> events
-        $stmt2 = $pdo->query('SELECT ir.iofId, e.eventorId, e.nimetus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId ORDER BY e.kuupaev DESC');
+    $stmt2 = $pdo->query('SELECT ir.iofId, e.eventorId, e.nimetus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId ORDER BY e.kuupaev DESC');
         $events = $stmt2->fetchAll();
         $athletes = [];
         foreach ($events as $ev) {
             $id = (string)$ev['iofId'];
             $athletes[$id]['firstname'] = $athletes[$id]['firstname'] ?? '';
             $athletes[$id]['lastname'] = $athletes[$id]['lastname'] ?? '';
-            $athletes[$id]['events'][] = ['date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints']];
+            $athletes[$id]['events'][] = ['date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
         }
 
         $dataStore = ['rankings' => $rankings, 'athletes' => $athletes];
@@ -147,7 +148,34 @@ if (str_starts_with($path, '/api/')) {
 // Page routes (server-side rendered templates)
 if ($path === '/') {
     $page = 'overview';
-    $viewData = ['rankings' => $dataStore['rankings'] ?? []];
+    $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+
+    $disciplines = ['F','FS','M','S'];
+    $sexes = ['MEN','WOMEN'];
+    $overview = [];
+
+    if (isset($pdo)) {
+        $calc = new Eol\Edetabel\RankCalculator($pdo);
+        foreach ($disciplines as $d) {
+            foreach ($sexes as $s) {
+                $rankings = $calc->computeForAlakoodYear($d, $year);
+                // filter by sex if runner sex is available in results
+                $filtered = array_values(array_filter($rankings, function($r) use ($s) { return ($r['sex'] ?? null) === $s; }));
+                $overview[$d][$s] = array_slice($filtered, 0, 10);
+            }
+        }
+    } else {
+        // fallback to sample dataStore grouping
+        foreach ($disciplines as $d) {
+            foreach ($sexes as $s) {
+                $rows = array_filter($dataStore['rankings'] ?? [], function($r) use ($d, $s) { return ($r['discipline'] ?? $d) === $d && ($r['sex'] ?? $s) === $s; });
+                usort($rows, function($a,$b){ return ($b['points'] <=> $a['points']); });
+                $overview[$d][$s] = array_slice(array_values($rows), 0, 10);
+            }
+        }
+    }
+
+    $viewData = ['overview' => $overview, 'year' => $year];
     include __DIR__ . '/templates/overview.php';
     exit;
 }

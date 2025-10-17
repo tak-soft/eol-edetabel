@@ -26,6 +26,27 @@ class RankCalculator
     }
 
     /**
+     * Load setting by alakood and year
+     */
+    public function loadSettingByAlakoodAndYear(string $alakood, int $year)
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM edetabli_seaded WHERE alakood = :alakood AND aasta = :aasta LIMIT 1');
+        $stmt->execute([':alakood' => $alakood, ':aasta' => $year]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /**
+     * Convenience: compute for a discipline code and year (if setting exists).
+     */
+    public function computeForAlakoodYear(string $alakood, int $year): array
+    {
+        $setting = $this->loadSettingByAlakoodAndYear($alakood, $year);
+        if (!$setting) return [];
+        return $this->computeForSetting($setting);
+    }
+
+    /**
      * Compute rankings for a given setting row.
      * Returns array of rows: [ ['place'=>1,'iofId'=>..., 'firstname'=>..., 'lastname'=>..., 'totalPoints'=>..., 'events'=>[...]] , ... ]
      */
@@ -39,8 +60,10 @@ class RankCalculator
         $startDate = $endDate->sub(new DateInterval('P' . max(1, $periodMonths) . 'M'));
 
         // fetch relevant results in window
+        // Note: Group (MEN/WOMEN) is stored per-result in iofresults as `Group`.
+        // Prefer reading runner name from iofrunners and Group from iofresults.
         $stmt = $this->pdo->prepare(
-            'SELECT ir.iofId, r.firstname, r.lastname, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
+            'SELECT ir.iofId, r.firstname, r.lastname, ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
              FROM iofresults ir
              JOIN iofevents e ON e.eventorId = ir.eventorId
              JOIN iofrunners r ON r.iofId = ir.iofId
@@ -62,6 +85,8 @@ class RankCalculator
             $byAthlete[$id]['iofId'] = (int)$row['iofId'];
             $byAthlete[$id]['firstname'] = $row['firstname'];
             $byAthlete[$id]['lastname'] = $row['lastname'];
+            // map per-result Group into athlete-level sex/group; use first seen
+            $byAthlete[$id]['sex'] = $row['runnerGroup'] ?? null;
             $byAthlete[$id]['events'][] = $event;
         }
 
@@ -78,16 +103,31 @@ class RankCalculator
                 'iofId' => $data['iofId'],
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
+                'sex' => $data['sex'] ?? null,
                 'totalPoints' => $total,
                 'events' => $data['events'],
             ];
         }
 
         usort($rankings, function ($a, $b) { return ($b['totalPoints'] <=> $a['totalPoints']); });
-        // assign places
-        $place = 1;
-        foreach ($rankings as &$r) {
-            $r['place'] = $place++;
+
+        // assign places with tie handling (standard competition ranking): equal totals -> same place, next place skips
+        $epsilon = 1e-6;
+        $count = count($rankings);
+        for ($i = 0; $i < $count; $i++) {
+            if ($i === 0) {
+                $rankings[$i]['place'] = 1;
+            } else {
+                $prev = $rankings[$i - 1]['totalPoints'];
+                $curr = $rankings[$i]['totalPoints'];
+                if (abs($curr - $prev) < $epsilon) {
+                    // same as previous
+                    $rankings[$i]['place'] = $rankings[$i - 1]['place'];
+                } else {
+                    // standard competition: place = index + 1
+                    $rankings[$i]['place'] = $i + 1;
+                }
+            }
         }
 
         return $rankings;

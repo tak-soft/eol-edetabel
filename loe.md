@@ -19,7 +19,7 @@ Lähteülesanne ja nõuded on toodud [failis](dok/viip_edetabel.md)
 Ülesanne rakenduse loomiseks sai antud Copiloti agendile (GPT-5 mini). 
 Ette antud ainult nõuete dokument ja sellest alustasime.
 
-Nii lähteülesanne kui jooksvad juhised antud eesti keeles.
+Nii lähteülesanne kui jooksvad juhised antud eesti keeles. Eesmärk on võimalikult vähe ise koodi kirjutada vaid juhendada. Väiksemaid muudatusi tegin ikkagi otse koodi, et kiiremini edasi jõuda.
 
 Arenduskeskkond  PHP arenduseks ja mySQL andmebaas käsitsi installitud ja seadistatud.
 

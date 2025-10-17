@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS iofrunners (
   iofId INT UNSIGNED PRIMARY KEY,
   firstname VARCHAR(50),
   lastname VARCHAR(50),
-  sex VARCHAR(6)
+    -- previously had sex; not required per updated spec
 );
 
 CREATE TABLE IF NOT EXISTS iofresults (
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS iofresults (
   tulemus INT,
   koht INT,
   RankPoints FLOAT,
+    `Group` VARCHAR(16),
   INDEX(eventorId),
   INDEX(iofId),
   UNIQUE KEY uq_event_iof (eventorId, iofId)

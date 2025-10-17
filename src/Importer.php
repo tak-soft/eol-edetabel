@@ -65,8 +65,10 @@ class Importer
         $count = 0;
         try {
             $stmtEvent = $pdo->prepare('INSERT INTO iofevents (eventorId, kuupaev, nimetus, distants, riik, alatunnus) VALUES (:eventorId, :kuupaev, :nimetus, :distants, :riik, :alatunnus) ON DUPLICATE KEY UPDATE nimetus=VALUES(nimetus), distants=VALUES(distants), riik=VALUES(riik), alatunnus=VALUES(alatunnus)');
-            $stmtRunner = $pdo->prepare('INSERT INTO iofrunners (iofId, firstname, lastname, sex) VALUES (:iofId, :firstname, :lastname, :sex) ON DUPLICATE KEY UPDATE firstname=VALUES(firstname), lastname=VALUES(lastname), sex=VALUES(sex)');
-            $stmtResult = $pdo->prepare('INSERT INTO iofresults (eventorId, iofId, tulemus, koht, RankPoints) VALUES (:eventorId, :iofId, :tulemus, :koht, :RankPoints) ON DUPLICATE KEY UPDATE tulemus=VALUES(tulemus), koht=VALUES(koht), RankPoints=VALUES(RankPoints)');
+            // iofrunners no longer stores sex; group is stored per-result in iofresults
+            $stmtRunner = $pdo->prepare('INSERT INTO iofrunners (iofId, firstname, lastname) VALUES (:iofId, :firstname, :lastname) ON DUPLICATE KEY UPDATE firstname=VALUES(firstname), lastname=VALUES(lastname)');
+            // persist Group (per-result) into iofresults as `Group`
+            $stmtResult = $pdo->prepare('INSERT INTO iofresults (eventorId, iofId, tulemus, koht, RankPoints, `Group`) VALUES (:eventorId, :iofId, :tulemus, :koht, :RankPoints, :group) ON DUPLICATE KEY UPDATE tulemus=VALUES(tulemus), koht=VALUES(koht), RankPoints=VALUES(RankPoints), `Group`=VALUES(`Group`)');
 
             foreach ($items as $it) {
                 // Map fields from API
@@ -87,7 +89,6 @@ class Importer
                     ':iofId' => $iofId,
                     ':firstname' => $it['FirstName'] ?? null,
                     ':lastname' => $it['LastName'] ?? null,
-                    ':sex' => $it['Group'] ?? null,
                 ]);
 
                 $stmtResult->execute([
@@ -96,6 +97,7 @@ class Importer
                     ':tulemus' => $it['RaceTimeSeconds'] ?? null,
                     ':koht' => $it['Position'] ?? null,
                     ':RankPoints' => $it['RankPoints'] ?? null,
+                    ':group' => $it['Group'] ?? null,
                 ]);
                 $count++;
             }

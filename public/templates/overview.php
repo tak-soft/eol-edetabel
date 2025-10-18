@@ -1,39 +1,62 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>EOL Edetabel</title>
   <link rel="stylesheet" href="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/css/pp-app-theme.css">
-  <style>body{font-family:Arial,Helvetica,sans-serif;padding:1rem} .leader{border:1px solid #ddd;padding:1rem;margin-bottom:1rem}</style>
+  <link rel="stylesheet" href="/assets/pp-app-theme-overrides.css">
 </head>
+
 <body>
   <h1>EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
-
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
-  <?php foreach ($viewData['overview'] as $discipline => $bySex): ?>
-    <div style="border:1px solid #ddd;padding:0.5rem;">
-      <h2><?php echo htmlspecialchars($discipline); ?></h2>
-      <?php foreach ($bySex as $sex => $rows): ?>
-        <h3><?php echo htmlspecialchars($sex); ?></h3>
-        <?php if (empty($rows)): ?>
-          <p><em>Puuduvad andmed</em></p>
-        <?php else: ?>
-          <?php $leader = $rows[0]; ?>
-          <div style="background:#f7f7f7;padding:0.5rem;margin-bottom:0.5rem;">
-            <strong><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></strong>
-            <div>Points: <?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?></div>
-            <a href="/athlete/<?php echo urlencode($leader['iofId'] ?? $leader['iofId']); ?>">vaata profiili</a>
-          </div>
-          <ol>
-            <?php foreach (array_slice($rows, 0, 10) as $r): ?>
-              <li><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?> — <?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?> <a href="/athlete/<?php echo urlencode($r['iofId']); ?>">detail</a></li>
-            <?php endforeach; ?>
-          </ol>
-        <?php endif; ?>
-      <?php endforeach; ?>
-    </div>
-  <?php endforeach; ?>
+  <?php
+  $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine', 'T' => 'Trail'];
+  $groups=['WOMEN'=>'Naised','MEN'=>'Mehed'];
+  ?>
+  <div class="disciplines-grid">
+    <?php foreach ($viewData['overview'] as $discipline => $bySex): ?>
+      <section class="discipline-card edetabel-card">
+        <h2 class="discipline-title"><?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h2>
+        <div class="discipline-grid">
+          <?php foreach (['WOMEN', 'MEN'] as $sexKey): ?>
+            <?php $rows = $bySex[$sexKey] ?? []; ?>
+            <div class="sex-column">
+              <h3 class="sex-title"><?php echo $groups[$sexKey]; ?></h3>
+              <?php if (empty($rows)): ?>
+                <p class="no-data"><em>Tulemused puuduvad</em></p>
+              <?php else: ?>
+                <?php $leader = $rows[0]; ?>
+                <div class="leader leader-big">
+                  <div class="leader-rank"><?php echo htmlspecialchars((string)($leader['place'] ?? $leader['koht'] ?? 1)); ?></div>
+                  <div class="leader-info">
+                    <div class="leader-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></div>
+                    <div class="leader-points"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?> p</div>
+                    <div class="leader-links"><a class="profile-link" href="/athlete/<?php echo urlencode($leader['iofId'] ?? $leader['iofId']); ?>">vaata profiili</a></div>
+                  </div>
+                </div>
+                <ol class="top-list compact">
+                  <?php foreach (array_slice($rows, 0, 10) as $idx => $r): ?>
+                    <li>
+                      <?php $place = $r['place'] ?? "-" ?>
+                      <span class="rank-num"><?php echo htmlspecialchars((string)$place); ?>.</span>
+                      <a class="r-link" href="/athlete/<?php echo urlencode($r['iofId']); ?>">
+                        <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
+                      </a><span class="r-points"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?> p</span>
+                    </li>
+                  <?php endforeach; ?>
+                </ol>
+                <div class="full-table">
+                  <a class="full-table-link" href="/discipline/<?php echo urlencode($discipline); ?>?sex=<?php echo urlencode($sexKey); ?>&amp;year=<?php echo urlencode((string)$viewData['year']); ?>">Täielik tabel</a>
+                </div>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endforeach; ?>
   </div>
 </body>
+
 </html>

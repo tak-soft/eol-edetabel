@@ -22,7 +22,7 @@ if (file_exists($rootEnvFile)) {
 }
 $dotenv->safeLoad();
 
-$from = $argv[1] ?? (new DateTimeImmutable('-1 month'))->format('Y-m-d');
+$from = $argv[1] ?? (new DateTimeImmutable('-1 year'))->format('Y-m-d');
 $to = $argv[2] ?? (new DateTimeImmutable())->format('Y-m-d');
 
 $apiKey = $_ENV['RANKING_API_KEY'] ?? '';

@@ -127,6 +127,16 @@ Teenused seadistused (konfiguratsioonis failist):
 * Järgmised kohad 2-10 Nimekirjana
 * Viide detailsemale leheküljele (ala ja perioodi põhine)
 
+Alade jaotus:
+
+| Orienteerumisjooks  | 
+| Naised    |  Mehed  | 
+| Orienteerumisjooks Sprint  | 
+| Naised    |  Mehed  | 
+| Rattaorienteerumine | 
+| Naised    |  Mehed  | 
+| Suusaorienteerumine | 
+| Naised    |  Mehed  | 
 
 
 ### Punktide detailsem vaade

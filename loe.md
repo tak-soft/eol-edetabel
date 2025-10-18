@@ -26,3 +26,11 @@ Arenduskeskkond  PHP arenduseks ja mySQL andmebaas käsitsi installitud ja seadi
 Tänapäeval ikka läheb suurem osa ajast keskkonna seadistamisele. Eriti kui pole PHPs mitmeid aastaid midagi teinud ja arendad uues arvutis.
 
 
+## Palju aega kulus
+
+Neljapäeval tunnike nõudeid kirjutades
+
+Reedel 3 tundi keskkonna ja esmase versiooni tegemisele.
+
+Laupäeval vaadete kujundamine 1,5 tundi kuni limiit täis sai.
+

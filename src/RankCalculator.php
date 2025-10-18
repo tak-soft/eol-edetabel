@@ -111,24 +111,40 @@ class RankCalculator
 
         usort($rankings, function ($a, $b) { return ($b['totalPoints'] <=> $a['totalPoints']); });
 
-        // assign places with tie handling (standard competition ranking): equal totals -> same place, next place skips
+        // assign places with tie handling per sex/group (standard competition ranking): equal totals -> same place, next place skips
         $epsilon = 1e-6;
-        $count = count($rankings);
-        for ($i = 0; $i < $count; $i++) {
-            if ($i === 0) {
-                $rankings[$i]['place'] = 1;
-            } else {
-                $prev = $rankings[$i - 1]['totalPoints'];
-                $curr = $rankings[$i]['totalPoints'];
-                if (abs($curr - $prev) < $epsilon) {
-                    // same as previous
-                    $rankings[$i]['place'] = $rankings[$i - 1]['place'];
+        // group rankings by sex (null/unknown grouped under empty string)
+        $groups = [];
+        foreach ($rankings as $r) {
+            $key = $r['sex'] ?? '';
+            if (!isset($groups[$key])) $groups[$key] = [];
+            $groups[$key][] = $r;
+        }
+
+        $final = [];
+        foreach ($groups as $key => $list) {
+            // sort each group's list by totalPoints desc to be safe
+            usort($list, function ($a, $b) { return ($b['totalPoints'] <=> $a['totalPoints']); });
+            $count = count($list);
+            for ($i = 0; $i < $count; $i++) {
+                if ($i === 0) {
+                    $list[$i]['place'] = 1;
                 } else {
-                    // standard competition: place = index + 1
-                    $rankings[$i]['place'] = $i + 1;
+                    $prev = $list[$i - 1]['totalPoints'];
+                    $curr = $list[$i]['totalPoints'];
+                    if (abs($curr - $prev) < $epsilon) {
+                        $list[$i]['place'] = $list[$i - 1]['place'];
+                    } else {
+                        $list[$i]['place'] = $i + 1;
+                    }
                 }
             }
+            // append group results to final list
+            foreach ($list as $item) $final[] = $item;
         }
+
+        // final contains all athletes with place assigned per their group
+        $rankings = $final;
 
         return $rankings;
     }

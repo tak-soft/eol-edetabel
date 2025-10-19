@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If the request is for an existing file or directory, serve it directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Otherwise rewrite to index.php (preserve query string)
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+# Fallback for environments without mod_rewrite: route non-file requests to index.php
+<IfModule !mod_rewrite.c>
+    <IfModule mod_alias.c>
+        RedirectMatch 404 "^/\.env$"
+    </IfModule>
+</IfModule>

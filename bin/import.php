@@ -8,21 +8,15 @@ use Dotenv\Dotenv;
 use Eol\Edetabel\Importer;
 use Eol\Edetabel\Database;
 
-$rootEnvDir = realpath(__DIR__ . '/../');
-$rootEnvFile = $rootEnvDir . DIRECTORY_SEPARATOR . '.env';
 $configEnvDir = realpath(__DIR__ . '/../config');
 $configEnvFile = $configEnvDir ? $configEnvDir . DIRECTORY_SEPARATOR . '.env' : null;
 
-if (file_exists($rootEnvFile)) {
-    $dotenv = Dotenv::createImmutable($rootEnvDir);
-} elseif ($configEnvFile && file_exists($configEnvFile)) {
+if (file_exists($configEnvFile)) {
     $dotenv = Dotenv::createImmutable($configEnvDir);
-} else {
-    $dotenv = Dotenv::createImmutable($rootEnvDir);
-}
-$dotenv->safeLoad();
+    $dotenv->safeLoad();
+} 
 
-$from = $argv[1] ?? (new DateTimeImmutable('-1 year'))->format('Y-m-d');
+$from = $argv[1] ?? (new DateTimeImmutable('-1 month'))->format('Y-m-d');
 $to = $argv[2] ?? (new DateTimeImmutable())->format('Y-m-d');
 
 $apiKey = $_ENV['RANKING_API_KEY'] ?? '';
@@ -45,5 +39,5 @@ if ($db && count($data) > 0) {
     $persisted = $importer->persistResults($data);
     echo "Persisted: $persisted rows\n";
 } else {
-    echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+   // echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
 }

@@ -30,20 +30,20 @@
                 <?php $leader = $rows[0]; ?>
                 <div class="leader leader-big">
                   <div class="leader-rank"><?php echo htmlspecialchars((string)($leader['place'] ?? $leader['koht'] ?? 1)); ?></div>
+                  <div class="leader-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></div>
                   <div class="leader-info">
-                    <div class="leader-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></div>
-                    <div class="leader-points"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?> p</div>
+                    <div class="leader-points"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?></div>
                     <div class="leader-links"><a class="profile-link" href="/athlete/<?php echo urlencode($leader['iofId'] ?? $leader['iofId']); ?>">vaata profiili</a></div>
                   </div>
                 </div>
                 <ol class="top-list compact">
-                  <?php foreach (array_slice($rows, 0, 10) as $idx => $r): ?>
+                  <?php foreach (array_slice($rows, 1, 10) as $idx => $r): ?>
                     <li>
                       <?php $place = $r['place'] ?? "-" ?>
                       <span class="rank-num"><?php echo htmlspecialchars((string)$place); ?>.</span>
                       <a class="r-link" href="/athlete/<?php echo urlencode($r['iofId']); ?>">
                         <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
-                      </a><span class="r-points"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?> p</span>
+                      </a><span class="r-points"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?></span>
                     </li>
                   <?php endforeach; ?>
                 </ol>

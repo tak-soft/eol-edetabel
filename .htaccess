@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule    ^(\.well-known/.*)$ $1 [L]
+    # If the request is already for /public, do nothing
+    RewriteCond %{REQUEST_URI} !^/public/
+
+    # If the target exists in the filesystem, serve it directly
+    RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI} -d
+    RewriteRule ^ - [L]
+
+    # Otherwise rewrite to /public/index.php preserving path
+    RewriteRule ^(.*)$ /public/$1 [L]
+</IfModule>

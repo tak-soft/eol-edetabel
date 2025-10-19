@@ -1,6 +1,6 @@
 /* Minimal overrides to layout discipline TOP10 columns side-by-side on wide screens */
 body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5f7f9; color: #222; }
-.disciplines-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1rem; align-items: start; grid-auto-rows: auto; align-content: start; }
+.disciplines-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1rem; align-items: start; grid-auto-rows: auto; align-content: start; }
 .discipline-card { border: 1px solid #e2e6ea; padding: 0.6rem; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,0.03); box-sizing: border-box; position: relative; display:flex; flex-direction:column; z-index:0; overflow: visible; min-height:0; isolation:isolate; }
 .edetabel-card { border-radius: 4px; }
 .discipline-title { margin: 0 0 0.6rem 0; font-size: 1.15rem; color: #0b4d80; }
@@ -20,7 +20,7 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 .rank-num { width:28px; color:#777; }
 .r-name { flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .r-points { color:#0b4d80; margin-left:0.5rem; font-weight:600; white-space:nowrap; min-width:64px; text-align:right; }
-.r-link { margin-left:0.6rem; color:#0b4d80; text-decoration:none; font-size:0.85rem; }
+.r-link { margin-left:0.6rem; color:#0b4d80; text-decoration:none; font-size:0.85rem; width: 100px; max-width: 100px; }
 .no-data { color: #888; font-style:italic; }
 
 /* At wider screens show WOMEN and MEN side-by-side */

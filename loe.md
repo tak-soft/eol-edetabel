@@ -28,9 +28,11 @@ Tänapäeval ikka läheb suurem osa ajast keskkonna seadistamisele. Eriti kui po
 
 ## Palju aega kulus
 
-Neljapäeval tunnike nõudeid kirjutades
+Neljapäeval tunnike nõudeid kirjutades-
 
 Reedel 3 tundi keskkonna ja esmase versiooni tegemisele.
 
 Laupäeval vaadete kujundamine 1,5 tundi kuni limiit täis sai.
+
+Pühapäeval natuke üle tunni, et rakendus EOLi serveris käima panna.
 

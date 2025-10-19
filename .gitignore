@@ -1,2 +1,11 @@
 vendor
 seadistused
+
+/config/.env
+/config/.env.eol
+/vendors/*
+
+.phpunit.result.cache
+.phpunit.cache
+
+.env

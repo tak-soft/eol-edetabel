@@ -22,6 +22,7 @@ Rakendus arvutab jooksva edetabeli punktid vastavalt juhendile:
 Võistlejale arvutatakse võistluse edetabelipunktid IOF edetabeli reeglite kohaselt.  
 EOLi jooksvasse edetabelisse arvestatakse IOF edetabelist viimase 12 kuu tulemused. 
 Võistlusalade kaupa on arvesse minevate tulemuste arv: 
+
 • Orienteerumisjooks – 4  
 • Orienteerumisjooks Sprint -3 
 • Rattaorienteerumine - 3 
@@ -37,15 +38,9 @@ Võistlusalade kaupa on arvesse minevate tulemuste arv:
 * Väljanägemine sarnane vanale edetabelile: https://orienteerumine.ee/edetabel/
 * Edetabel hakkab olema alamdomeenil edetabel.orienteerumine.ee
 
-
-
 ## Andmete laadimine
 
-
-
 IOF API kaudu laetakse kord päevas automaatselt viimase kuu aja WRE punktid kõigi 4 ala kohta. Andmete laadimiseks teha API. Cron töö regulaarselt kutsub välja API otspunkti.
-
-
 
 Andmed salvestatakse lokaalsesse andmebaasi
 
@@ -54,62 +49,55 @@ Andmed salvestatakse lokaalsesse andmebaasi
 * uuendatakse tulemused
 
 
-
 #### Andmebaasi tabelid:
 
 Tuleb luua mySQL andmebaas järgmiste tabelitega:
 
 Võistluste tabel : iofevents
 
-   - eventorId - Unique, Index
-   - kuupäev - date
-   - nimetus - string
-   - distants - string
-   - riik - string[3]
-   - alatunnus -- F|FS|M|S|T
-
-
+- eventorId - Unique, Index
+- kuupäev - date
+- nimetus - string
+- distants - string
+- riik - string[3]
+- alatunnus -- F|FS|M|S|T
 
 Isikute tabel : iofrunners
 
-   - iofId - Unique, Index
-   - firstname - string
-   - lastname - string
+- iofId - Unique, Index
+- firstname - string
+- lastname - string
  
 
 Tulemused : iofresults
 
-   - id - Index
-   - eventorId -- iofevents.eventorId
-   - iofId -- iofrunners.iofId
-   - tulemus -- numbri kujul aeg sekundites
-   - koht võistlusel -- number
-   - WRE punktid -- number
+- id - Index
+- eventorId -- iofevents.eventorId
+- iofId -- iofrunners.iofId
+- tulemus -- numbri kujul aeg sekundites
+- koht võistlusel -- number
+- WRE punktid -- number
  
 
 Alade seadistused : edetabli_seaded
 
-  - id - idx
-  - aasta -number
-  - nimetus - string
-  - alakood - string
-  - periood_lopp - date
-  - periood_kuud - number - kui palju kuid võetakse arvesse
-  - arvesse - number - kui palju parimaid punkte läheb arvesse
-
-
-
+- id - idx
+- aasta -number
+- nimetus - string
+- alakood - string
+- periood_lopp - date
+- periood_kuud - number - kui palju kuid võetakse arvesse
+- arvesse - number - kui palju parimaid punkte läheb arvesse
 
 
 ### Seadistused
 
-
 Teenused seadistused (konfiguratsioonis failist):
 
-  - URL
-  - IOF API Key hoidmine (RankingAPIKeyForFederation)
-  - alade loetelu ja järjekord
-  - mySQL ühenduse andmed
+- URL
+- IOF API Key hoidmine (RankingAPIKeyForFederation)
+- alade loetelu ja järjekord
+- mySQL ühenduse andmed
 
 
 ## Kuvamine
@@ -129,14 +117,15 @@ Teenused seadistused (konfiguratsioonis failist):
 
 Alade jaotus:
 
-| Orienteerumisjooks  | 
-| Naised    |  Mehed  | 
-| Orienteerumisjooks Sprint  | 
-| Naised    |  Mehed  | 
-| Rattaorienteerumine | 
-| Naised    |  Mehed  | 
-| Suusaorienteerumine | 
-| Naised    |  Mehed  | 
+ || -----------|--------- |
+ || Orienteerumisjooks    | 
+ || Naised    |  Mehed    | 
+ || Orienteerumisjooks Sprint  | 
+ || Naised    |  Mehed    | 
+ || Rattaorienteerumine   | 
+ || Naised    |  Mehed    | 
+ || Suusaorienteerumine   | 
+ || Naised    |  Mehed    | 
 
 
 ### Punktide detailsem vaade

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="et">
 
 <head>
   <meta charset="utf-8">
@@ -12,8 +12,9 @@
 <body>
   <h1>EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
   <?php
-  $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine', 'T' => 'Trail'];
-  $groups=['WOMEN'=>'Naised','MEN'=>'Mehed'];
+  // Use discipline names provided by controller (from edetabli_seaded) when available
+  $disciplineNames = $viewData['disciplineNames'] ?? ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine', 'T' => 'Trail'];
+  $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
   ?>
   <div class="disciplines-grid">
     <?php foreach ($viewData['overview'] as $discipline => $bySex): ?>

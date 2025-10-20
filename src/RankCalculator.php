@@ -36,6 +36,17 @@ class RankCalculator
         return $row ?: null;
     }
 
+    public function loadPeriods(){
+        $stmt = $this->pdo->prepare('SELECT DISTINCT aasta FROM edetabli_seaded ORDER BY aasta DESC');
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $periods = [];
+        foreach ($rows as $row) {
+            $periods[] = (int)$row['aasta'];
+        }
+        return $periods;
+    }
+
     /**
      * Convenience: compute for a discipline code and year (if setting exists).
      */
@@ -106,6 +117,8 @@ class RankCalculator
                 'sex' => $data['sex'] ?? null,
                 'totalPoints' => $total,
                 'events' => $data['events'],
+                // which events were counted towards the total (top N or all)
+                'countedEvents' => $toTake,
             ];
         }
 

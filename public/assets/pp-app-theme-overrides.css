@@ -20,7 +20,7 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 .rank-num { width:28px; color:#777; }
 .r-name { flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .r-points { color:#0b4d80; margin-left:0.5rem; font-weight:600; white-space:nowrap; min-width:64px; text-align:right; }
-.r-link { margin-left:0.6rem; color:#0b4d80; text-decoration:none; font-size:0.85rem; width: 100px; max-width: 100px; }
+.r-link { margin-left:0.6rem; color:#0b4d80; text-decoration:none; font-size:0.85rem; width: 130px;  }
 .no-data { color: #888; font-style:italic; }
 
 /* At wider screens show WOMEN and MEN side-by-side */
@@ -31,20 +31,19 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 }
 
 /* Force single column on small screens up to 900px to avoid overlap at intermediate widths */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .disciplines-grid { grid-template-columns: 1fr; }
 }
 
 /* Two-column layout for medium screens between 900px and 1199px */
-@media (min-width: 901px) and (max-width: 1199px) {
+@media (min-width: 1201px) and (max-width: 1499px) {
   .disciplines-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* On larger screens constrain card height and allow internal scrolling for long columns */
-@media (min-width: 1000px) {
-  .discipline-card { max-height: 60vh; }
+@media (min-width: 1500px) {
   .discipline-grid { overflow: hidden; }
-  .sex-column { overflow: auto; max-height: calc(60vh - 60px); }
+  .sex-column { overflow: auto; }
 
   /* subtle scrollbar styling (Webkit) */
   .sex-column::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -53,7 +52,7 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 }
 
 /* On small screens allow natural expansion (no internal scrolling) */
-@media (max-width: 999px) {
+@media (max-width: 1119px) {
   .sex-column { overflow: visible; max-height: none; }
   .discipline-card { max-height: none; }
 }
@@ -61,3 +60,7 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 .full-table { margin-top: 0.5rem; }
 .full-table-link { display:inline-block; padding:0.35rem 0.6rem; background:#0b4d80; color:#fff; text-decoration:none; border-radius:3px; font-size:0.9rem; }
 .full-table-link:hover { background:#093a5f; }
+
+/* Chips for counted event points in discipline table */
+.event-points { display:inline-block; padding:0.15rem 0.35rem; margin-right:0.35rem; background:#f2f6fb; border:1px solid #e0eaf6; border-radius:3px; font-size:0.85rem; color:#0b4d80; }
+.event-points[title] { cursor: help; }

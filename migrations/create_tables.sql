@@ -38,3 +38,34 @@ CREATE TABLE IF NOT EXISTS edetabli_seaded (
   periood_kuud INT DEFAULT 12,
   arvesse INT DEFAULT 0
 );
+
+
+CREATE TABLE `eolkoodid` (
+  `ID` int(11) NOT NULL,
+  `EESNIMI` varchar(30) DEFAULT '',
+  `PERENIMI` varchar(30) DEFAULT '',
+  `SYNNIKUUP` date DEFAULT '0000-00-00',
+  `SUGU` char(1) DEFAULT '',
+  `MAAKOND` varchar(25) DEFAULT '',
+  `KLUBI` varchar(200) DEFAULT NULL,
+  `ASUTUS` varchar(50) DEFAULT '',
+  `EPOST` varchar(50) DEFAULT '',
+  `RESERV` tinyint(4) NOT NULL DEFAULT 0,
+  `SIKAART` varchar(40) DEFAULT '',
+  `MUUDATUS` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `KOOD` int(11) NOT NULL DEFAULT 0,
+  `LITSENTS` date NOT NULL DEFAULT '0000-00-00',
+  `litsents_eolteenus_id` int(11) DEFAULT NULL,
+  `KLASS` varchar(10) NOT NULL DEFAULT '',
+  `ISIKUKOOD` varchar(12) NOT NULL DEFAULT '',
+  `AVALDAN` tinyint(1) NOT NULL DEFAULT 0,
+  `MUUTKP` datetime DEFAULT NULL,
+  `MUUTJA` varchar(30) DEFAULT NULL,
+  `NA` tinyint(1) DEFAULT 1,
+  `PASSWRD` varchar(40) NOT NULL DEFAULT '',
+  `ALIAS` varchar(40) NOT NULL DEFAULT '',
+  `PASSPORT` tinyint(1) NOT NULL DEFAULT 1,
+  `IOFKOOD` int(11) DEFAULT NULL,
+  `FOTO` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_estonian_ci;
+

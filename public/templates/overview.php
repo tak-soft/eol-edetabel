@@ -10,21 +10,32 @@
 </head>
 
 <body>
-  <h1>EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
-  <?php
-  // Use discipline names provided by controller (from edetabli_seaded) when available
-  $disciplineNames = $viewData['disciplineNames'] ?? ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine', 'T' => 'Trail'];
-  $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
-  ?>
+  <section class="app-title">
+    <h1 class="app-title__heading">EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
+  </section>
+  <nav class="nav-national-team">
+    <?php
+    // Use discipline names provided by controller (from edetabli_seaded) when available
+    $disciplineNames = $viewData['disciplineNames'];
+    $periods = $viewData['periods'] ?? [];
+    $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
+    foreach ($periods as $key => $value) {
+      $selected = $key == $viewData['year'] ? ' current-menu-item': '';
+      echo '<a class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3707'.$selected.'" hreflang="et" href="/?year=' . $value . '">' . $value . '</a>';
+    }
+    ?>
+  </nav>
   <div class="disciplines-grid">
-    <?php foreach ($viewData['overview'] as $discipline => $bySex): ?>
+    <?php foreach ($viewData['overview'] as $discipline => $bygroup): ?>
       <section class="discipline-card edetabel-card">
+
+
         <h2 class="discipline-title"><?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h2>
         <div class="discipline-grid">
-          <?php foreach (['WOMEN', 'MEN'] as $sexKey): ?>
-            <?php $rows = $bySex[$sexKey] ?? []; ?>
-            <div class="sex-column">
-              <h3 class="sex-title"><?php echo $groups[$sexKey]; ?></h3>
+          <?php foreach (['WOMEN', 'MEN'] as $groupKey): ?>
+            <?php $rows = $bygroup[$groupKey] ?? []; ?>
+            <div class="group-column">
+              <h3 class="group-title"><?php echo $groups[$groupKey]; ?></h3>
               <?php if (empty($rows)): ?>
                 <p class="no-data"><em>Tulemused puuduvad</em></p>
               <?php else: ?>
@@ -49,7 +60,7 @@
                   <?php endforeach; ?>
                 </ol>
                 <div class="full-table">
-                  <a class="full-table-link" href="/discipline/<?php echo urlencode($discipline); ?>?sex=<?php echo urlencode($sexKey); ?>&amp;year=<?php echo urlencode((string)$viewData['year']); ?>">Täielik tabel</a>
+                  <a class="full-table-link" href="/discipline/<?php echo urlencode($discipline); ?>?group=<?php echo urlencode($groupKey); ?>&amp;year=<?php echo urlencode((string)$viewData['year']); ?>">Täielik tabel</a>
                 </div>
               <?php endif; ?>
             </div>

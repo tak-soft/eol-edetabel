@@ -1,4 +1,5 @@
 <?php
+
 namespace Eol\Edetabel;
 
 use DateTimeImmutable;
@@ -15,17 +16,6 @@ class RankCalculator
     }
 
     /**
-     * Load setting by discipline code (alakood). Returns associative array or null.
-     */
-    public function loadSettingByAlakood(string $alakood)
-    {
-        $stmt = $this->pdo->prepare('SELECT * FROM edetabli_seaded WHERE alakood = :alakood ORDER BY aasta DESC LIMIT 1');
-        $stmt->execute([':alakood' => $alakood]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
-    }
-
-    /**
      * Load setting by alakood and year
      */
     public function loadSettingByAlakoodAndYear(string $alakood, int $year)
@@ -34,17 +24,6 @@ class RankCalculator
         $stmt->execute([':alakood' => $alakood, ':aasta' => $year]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
-    }
-
-    public function loadPeriods(){
-        $stmt = $this->pdo->prepare('SELECT DISTINCT aasta FROM edetabli_seaded ORDER BY aasta DESC');
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $periods = [];
-        foreach ($rows as $row) {
-            $periods[] = (int)$row['aasta'];
-        }
-        return $periods;
     }
 
     /**
@@ -66,13 +45,20 @@ class RankCalculator
         $alakood = $setting['alakood'];
         $periodMonths = (int)($setting['periood_kuud'] ?? 12);
         $takeBest = (int)($setting['arvesse'] ?? 0);
-
-        $endDate = $setting['periood_lopp'] ? new DateTimeImmutable($setting['periood_lopp']) : new DateTimeImmutable();
+        $dateToday = new DateTimeImmutable();
+        $endDate = $setting['periood_lopp'] ? new DateTimeImmutable($setting['periood_lopp']) : $dateToday;
+        if ($endDate > $dateToday) {
+            $endDate = $dateToday;
+        }
         $startDate = $endDate->sub(new DateInterval('P' . max(1, $periodMonths) . 'M'));
+
+
+        echo "Computing rankings for discipline $alakood from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . ", taking best " . ($takeBest > 0 ? $takeBest : 'all') . " results per athlete.\n";
 
         // fetch relevant results in window
         // Note: Group (MEN/WOMEN) is stored per-result in iofresults as `Group`.
         // Prefer reading runner name from iofrunners and Group from iofresults.
+        // Tudu: Kui eolkoodid tabelis on IOFKOOD järgi kirje olemas, siis võta sealt firstname/lastname asemel EESNIMI/PERENIMI.
         $stmt = $this->pdo->prepare(
             'SELECT ir.iofId, r.firstname, r.lastname, ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
              FROM iofresults ir
@@ -97,14 +83,16 @@ class RankCalculator
             $byAthlete[$id]['firstname'] = $row['firstname'];
             $byAthlete[$id]['lastname'] = $row['lastname'];
             // map per-result Group into athlete-level sex/group; use first seen
-            $byAthlete[$id]['sex'] = $row['runnerGroup'] ?? null;
+            $byAthlete[$id]['group'] = $row['runnerGroup'] ?? null;
             $byAthlete[$id]['events'][] = $event;
         }
 
         $rankings = [];
         foreach ($byAthlete as $id => $data) {
             // sort athlete events by points desc
-            usort($data['events'], function ($a, $b) { return ($b['points'] <=> $a['points']); });
+            usort($data['events'], function ($a, $b) {
+                return ($b['points'] <=> $a['points']);
+            });
             // take top N if arvesse>0 else sum all
             $toTake = $takeBest > 0 ? array_slice($data['events'], 0, $takeBest) : $data['events'];
             $total = 0.0;
@@ -114,7 +102,7 @@ class RankCalculator
                 'iofId' => $data['iofId'],
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
-                'sex' => $data['sex'] ?? null,
+                'group' => $data['group'] ?? null,
                 'totalPoints' => $total,
                 'events' => $data['events'],
                 // which events were counted towards the total (top N or all)
@@ -122,7 +110,9 @@ class RankCalculator
             ];
         }
 
-        usort($rankings, function ($a, $b) { return ($b['totalPoints'] <=> $a['totalPoints']); });
+        usort($rankings, function ($a, $b) {
+            return ($b['totalPoints'] <=> $a['totalPoints']);
+        });
 
         // assign places with tie handling per sex/group (standard competition ranking): equal totals -> same place, next place skips
         $epsilon = 1e-6;
@@ -137,7 +127,9 @@ class RankCalculator
         $final = [];
         foreach ($groups as $key => $list) {
             // sort each group's list by totalPoints desc to be safe
-            usort($list, function ($a, $b) { return ($b['totalPoints'] <=> $a['totalPoints']); });
+            usort($list, function ($a, $b) {
+                return ($b['totalPoints'] <=> $a['totalPoints']);
+            });
             $count = count($list);
             for ($i = 0; $i < $count; $i++) {
                 if ($i === 0) {

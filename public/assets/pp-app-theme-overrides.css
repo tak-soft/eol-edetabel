@@ -5,9 +5,9 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 .edetabel-card { border-radius: 4px; }
 .discipline-title { margin: 0 0 0.6rem 0; font-size: 1.15rem; color: #0b4d80; }
 .discipline-grid { display: flex; flex-direction: column; gap: 0.8rem; min-height: 0; flex: 0 0 auto; overflow: visible; }
-.sex-column { border-top: 1px dashed #eee; padding-top: 0.6rem; }
-.sex-column { min-height: 0; }
-.sex-title { margin: 0 0 0.35rem 0; font-size: 0.95rem; color: #555; }
+.group-column { border-top: 1px dashed #eee; padding-top: 0.6rem; }
+.group-column { min-height: 0; }
+.group-title { margin: 0 0 0.35rem 0; font-size: 0.95rem; color: #555; }
 .leader { border: 1px solid #e6eef6; padding: 0.6rem; background: linear-gradient(180deg,#ffffff,#f7fbff); margin-bottom: 0.6rem; display:flex; align-items:center; min-width:0; }
 .leader-big { padding: 0.4rem; }
 .leader-rank { font-size: 1.6rem; font-weight:700; color:#0b4d80; width:48px; text-align:center; }
@@ -26,8 +26,8 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 /* At wider screens show WOMEN and MEN side-by-side */
 @media (min-width: 600px) {
   .discipline-grid { flex-direction: row; }
-  .sex-column { flex: 1 1 50%; border-top: none; padding: 0.6rem; }
-  .sex-column + .sex-column { border-left: 1px solid #f5f7f9; }
+  .group-column { flex: 1 1 50%; border-top: none; padding: 0.6rem; }
+  .group-column + .group-column { border-left: 1px solid #f5f7f9; }
 }
 
 /* Force single column on small screens up to 900px to avoid overlap at intermediate widths */
@@ -43,17 +43,17 @@ body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5
 /* On larger screens constrain card height and allow internal scrolling for long columns */
 @media (min-width: 1500px) {
   .discipline-grid { overflow: hidden; }
-  .sex-column { overflow: auto; }
+  .group-column { overflow: auto; }
 
   /* subtle scrollbar styling (Webkit) */
-  .sex-column::-webkit-scrollbar { width: 8px; height: 8px; }
-  .sex-column::-webkit-scrollbar-thumb { background: rgba(11,77,128,0.18); border-radius: 4px; }
-  .sex-column::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
+  .group-column::-webkit-scrollbar { width: 8px; height: 8px; }
+  .group-column::-webkit-scrollbar-thumb { background: rgba(11,77,128,0.18); border-radius: 4px; }
+  .group-column::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
 }
 
 /* On small screens allow natural expansion (no internal scrolling) */
 @media (max-width: 1119px) {
-  .sex-column { overflow: visible; max-height: none; }
+  .group-column { overflow: visible; max-height: none; }
   .discipline-card { max-height: none; }
 }
 

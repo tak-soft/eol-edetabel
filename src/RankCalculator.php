@@ -52,18 +52,24 @@ class RankCalculator
         }
         $startDate = $endDate->sub(new DateInterval('P' . max(1, $periodMonths) . 'M'));
 
-
-        echo "Computing rankings for discipline $alakood from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . ", taking best " . ($takeBest > 0 ? $takeBest : 'all') . " results per athlete.\n";
+//      echo "Computing rankings for discipline $alakood from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . ", taking best " . ($takeBest > 0 ? $takeBest : 'all') . " results per athlete.\n";
 
         // fetch relevant results in window
         // Note: Group (MEN/WOMEN) is stored per-result in iofresults as `Group`.
         // Prefer reading runner name from iofrunners and Group from iofresults.
-        // Tudu: Kui eolkoodid tabelis on IOFKOOD järgi kirje olemas, siis võta sealt firstname/lastname asemel EESNIMI/PERENIMI.
+        // TEHTUD: Kui eolkoodid tabelis on IOFKOOD järgi kirje olemas, siis võta sealt firstname/lastname asemel EESNIMI/PERENIMI.
+        // Prefer names from `eolkoodid` (EESNIMI/PERENIMI) when a record exists for the IOF id (IOFKOOD).
+        // Fallback to iofrunners.firstname / iofrunners.lastname when no eolkoodid entry.
         $stmt = $this->pdo->prepare(
-            'SELECT ir.iofId, r.firstname, r.lastname, ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
+            'SELECT ir.iofId,
+                    COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
+                    COALESCE(eolk.PERENIMI, r.lastname) AS lastname,
+                    COALESCE(eolk.KLUBI, null) AS clubname,
+                    ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
              FROM iofresults ir
              JOIN iofevents e ON e.eventorId = ir.eventorId
              JOIN iofrunners r ON r.iofId = ir.iofId
+             LEFT JOIN eolkoodid eolk ON eolk.IOFKOOD = ir.iofId
              WHERE e.alatunnus = :alakood AND e.kuupaev BETWEEN :start AND :end'
         );
         $stmt->execute([':alakood' => $alakood, ':start' => $startDate->format('Y-m-d'), ':end' => $endDate->format('Y-m-d')]);
@@ -82,6 +88,7 @@ class RankCalculator
             $byAthlete[$id]['iofId'] = (int)$row['iofId'];
             $byAthlete[$id]['firstname'] = $row['firstname'];
             $byAthlete[$id]['lastname'] = $row['lastname'];
+            $byAthlete[$id]['clubname'] = $row['clubname'] ?? null;
             // map per-result Group into athlete-level sex/group; use first seen
             $byAthlete[$id]['group'] = $row['runnerGroup'] ?? null;
             $byAthlete[$id]['events'][] = $event;
@@ -102,6 +109,7 @@ class RankCalculator
                 'iofId' => $data['iofId'],
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
+                'clubname' => $data['clubname'] ?? '',
                 'group' => $data['group'] ?? null,
                 'totalPoints' => $total,
                 'events' => $data['events'],
@@ -119,7 +127,7 @@ class RankCalculator
         // group rankings by sex (null/unknown grouped under empty string)
         $groups = [];
         foreach ($rankings as $r) {
-            $key = $r['sex'] ?? '';
+            $key = $r['group'] ?? '';
             if (!isset($groups[$key])) $groups[$key] = [];
             $groups[$key][] = $r;
         }

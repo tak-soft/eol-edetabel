@@ -101,7 +101,6 @@ if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
     }
 }
 
-
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $rawPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 $path = rtrim($rawPath, '/');
@@ -260,8 +259,8 @@ if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
         }
             */
     //  }
-    echo $edetabliSeadedByYear[$year][$discipline] ?? null;
-    $viewData = ['discipline' => $discipline, 'rankings' => $discipline ?? []];
+    $disciplineName= $edetabliSeadedByYear[$year][$discipline]['nimetus'] ?? $discipline;
+    $viewData = ['discipline'=>$discipline, 'disciplineName' => $disciplineName, 'rankings' => $rankings ?? []];
     include __DIR__ . '/templates/discipline.php';
     exit;
 }

@@ -28,8 +28,6 @@
   <div class="disciplines-grid">
     <?php foreach ($viewData['overview'] as $discipline => $bygroup): ?>
       <section class="discipline-card edetabel-card">
-
-
         <h2 class="discipline-title"><?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h2>
         <div class="discipline-grid">
           <?php foreach (['WOMEN', 'MEN'] as $groupKey): ?>

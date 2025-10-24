@@ -38,7 +38,7 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
   <?php if (!$viewData['athlete']): ?>
     <p>Not found</p>
   <?php else: ?>
-    <div class="disciplines-grid">
+    <div class="container-xl disciplines-grid">
       <section class="discipline-card edetabel-card">
         <h2 class="discipline-title"><?php echo htmlspecialchars($viewData['athlete']['firstname'] . ' ' . $viewData['athlete']['lastname']); ?></h2>
 
@@ -56,7 +56,7 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
                       <div style="font-size:0.95rem; font-weight:600;">
                         <?php if (!empty($e['eventorId'])): ?>
                           <?php $iofEventUrl = 'https://ranking.orienteering.org/ResultsView?event=' . urlencode($e['eventorId']) . '&person=' . urlencode($viewData['iofId']) . '&ohow=' . urlencode($e['alatunnus'] ?? ''); ?>
-                          <a href="<?php echo htmlspecialchars($iofEventUrl); ?>" target="_blank" rel="noopener noreferrer"><?php echo htmlspecialchars($e['name'] ?? ''); ?></a>
+                          <a href="<?php echo htmlspecialchars($iofEventUrl); ?>" target="_iof" rel="noopener noreferrer"><?php echo htmlspecialchars($e['name'] ?? ''); ?></a>
                         <?php else: ?>
                           <?php echo htmlspecialchars($e['name'] ?? ''); ?>
                         <?php endif; ?>

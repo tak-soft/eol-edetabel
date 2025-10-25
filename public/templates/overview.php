@@ -20,8 +20,8 @@
     $periods = $viewData['periods'] ?? [];
     $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
     foreach ($periods as $key => $value) {
-      $selected = $key == $viewData['year'] ? ' current-menu-item': '';
-      echo '<a class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3707'.$selected.'" hreflang="et" href="/?year=' . $value . '">' . $value . '</a>';
+      $selected = $key == $viewData['year'] ? ' current-menu-item' : '';
+      echo '<a class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3707' . $selected . '" hreflang="et" href="/?year=' . $value . '">' . $value . '</a>';
     }
     ?>
   </nav>
@@ -40,10 +40,13 @@
                 <?php $leader = $rows[0]; ?>
                 <div class="leader leader-big">
                   <div class="leader-rank"><?php echo htmlspecialchars((string)($leader['place'] ?? $leader['koht'] ?? 1)); ?></div>
-                  <div class="leader-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></div>
+                  <div class="leader-name">
+                    <a class="profile-link" href="/athlete/<?php echo urlencode($leader['iofId'] ?? $leader['iofId']); ?>">
+                      <?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?>
+                    </a>
+                  </div>
                   <div class="leader-info">
                     <div class="leader-points"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?></div>
-                    <div class="leader-links"><a class="profile-link" href="/athlete/<?php echo urlencode($leader['iofId'] ?? $leader['iofId']); ?>">vaata profiili</a></div>
                   </div>
                 </div>
                 <ol class="top-list compact">

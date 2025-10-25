@@ -269,9 +269,21 @@ if (preg_match('#^/athlete/(\d+)$#', $path, $m)) {
     $iofId = $m[1];
     $page = 'athlete';
     // Tudu: Loeme jooksja andmed EOLi tabelist eolkoodid ja iofrunners kui seal ei ole
-    // Peab arvutama tema edetabeli punktid RankCalculatoriga?
+        $stmt2 = $pdo->prepare('SELECT ir.iofId, r.firstname, r.lastname, e.eventorId, e.nimetus, e.alatunnus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId JOIN iofrunners r ON r.iofId = ir.iofId WHERE r.iofId = :iofID ORDER BY e.kuupaev DESC');
+        $stmt2->execute([':iofID' => $iofId]);
+        $events = $stmt2->fetchAll();
+        $athletes = [];
+        foreach ($events as $ev) {
+            $id = (string)$ev['iofId'];
+            // set runner name from iofrunners
+            $athletes[$id]['firstname'] = $ev['firstname'] ?? ($athletes[$id]['firstname'] ?? '');
+            $athletes[$id]['lastname'] = $ev['lastname'] ?? ($athletes[$id]['lastname'] ?? '');
+            $athletes[$id]['events'][] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
+        }
+        // tudu: võistleja andmed eolkoodid tabelist
 
-    $viewData = ['iofId' => $iofId, 'athlete' => ($dataStore['athletes'][$iofId] ?? null)];
+
+    $viewData = ['iofId' => $iofId, 'athlete' => ($athletes[$iofId] ?? null)];
     include __DIR__ . '/templates/athlete.php';
     exit;
 }

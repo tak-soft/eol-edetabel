@@ -38,10 +38,11 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
   <?php if (!$viewData['athlete']): ?>
     <p>Not found</p>
   <?php else: ?>
+      <section class="app-title">
+    <h1 class="app-title__heading"><?php echo htmlspecialchars($viewData['athlete']['firstname'] . ' ' . $viewData['athlete']['lastname']); ?></h1>
+  </section>
     <div class="container-xl disciplines-grid">
       <section class="discipline-card edetabel-card">
-        <h2 class="discipline-title"><?php echo htmlspecialchars($viewData['athlete']['firstname'] . ' ' . $viewData['athlete']['lastname']); ?></h2>
-
         <div class="discipline-grid">
           <div class="sex-column">
             <div class="leader leader-big">

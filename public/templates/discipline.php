@@ -96,7 +96,7 @@
                 <a class="r-link" href="/athlete/<?php echo urlencode($r['iofId']); ?>">
                   <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
                 </a>
-                <span class="r-name"><?php echo htmlspecialchars($r['clubname']) ?></span>
+                <span class="r-name"><?php echo ($r['clubname']) ?></span>
                 <span class="r-points"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?></span>
                 <div>
                   <?php

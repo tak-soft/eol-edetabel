@@ -7,6 +7,10 @@ use Dotenv\Dotenv;
 // load Composer autoloader early so classes like Dotenv are available
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Set UTF-8 headers
+header('Content-Type: text/html; charset=utf-8');
+mb_internal_encoding('UTF-8');
+
 // Basic router + server-side plain PHP templates for smoke testing.
 // In a real project use a microframework but keep this simple for now.
 

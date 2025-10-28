@@ -36,3 +36,6 @@ Laupäeval vaadete kujundamine 1,5 tundi kuni limiit täis sai.
 
 Pühapäeval natuke üle tunni, et rakendus EOLi serveris käima panna.
 
+Reedel umbes 3 tundi, koodi ülevaatus ja täienduste tegemine käsitsi. EOLi stiilide kasutamine
+
+Laupäeval EOLi serveri uuendamine ja EOLi koodide andmebaasi kasutamine ning lõpuks 3 tundi et saaks erinevates kodeeringutes tabelitest andmed kokku. Käsitsi indeksite täiendamine.

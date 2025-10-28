@@ -20,12 +20,12 @@
     $periods = $viewData['periods'] ?? [];
     $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
     foreach ($periods as $key => $value) {
-      $selected = $key == $viewData['year'] ? ' current-menu-item' : '';
+      $selected = $value == $viewData['year'] ? ' current-menu-item' : '';
       echo '<a class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3707' . $selected . '" hreflang="et" href="/?year=' . $value . '">' . $value . '</a>';
     }
     ?>
   </nav>
-  <div class="disciplines-grid">
+  <div class="container-xl disciplines-grid">
     <?php foreach ($viewData['overview'] as $discipline => $bygroup): ?>
       <section class="discipline-card edetabel-card">
         <h2 class="discipline-title"><?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h2>

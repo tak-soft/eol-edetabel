@@ -22,7 +22,6 @@ function intTimeToString(?int $timeInSeconds): string
 $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine', 'T' => 'Trail'];
 
 ?>
-
 <!doctype html>
 <html lang="et">
 
@@ -63,7 +62,7 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
                         <?php endif; ?>
                       </div>
                       <div style="font-size:0.85rem; color:#666;">
-                        <?php echo htmlspecialchars($e['date'] ?? ''); ?> — tulemus: <?php echo intTimeToString($e['result']); ?>, koht: <?php echo htmlspecialchars((string)($e['place'] ?? '')); ?>, ala: <?php echo $disciplineNames[$e['alatunnus'] ?? '']; ?>
+                        <?php echo htmlspecialchars($e['date'] ?? ''); ?> — tulemus: <?php echo intTimeToString($e['result']); ?> koht: <?php echo htmlspecialchars((string)($e['place'] ?? '')); ?> ala: <?php echo $disciplineNames[$e['alatunnus'] ?? '']; ?>
                       </div>
                     </div>
                     <div style="min-width:64px; text-align:right; font-weight:600; color:#0b4d80;">
@@ -75,9 +74,6 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
             </ol>
           </div>
 
-        </div>
-        <div class="leader-info">
-          <div class="leader-links"><a class="profile-link" href="/api/athlete/<?php echo urlencode($viewData['iofId']); ?>">näita JSON</a></div>
         </div>
       </section>
     </div>

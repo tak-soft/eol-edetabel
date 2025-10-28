@@ -60,18 +60,21 @@ class RankCalculator
         // TEHTUD: Kui eolkoodid tabelis on IOFKOOD järgi kirje olemas, siis võta sealt firstname/lastname asemel EESNIMI/PERENIMI.
         // Prefer names from `eolkoodid` (EESNIMI/PERENIMI) when a record exists for the IOF id (IOFKOOD).
         // Fallback to iofrunners.firstname / iofrunners.lastname when no eolkoodid entry.
-        $stmt = $this->pdo->prepare(
-            'SELECT ir.iofId,
-                    COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
-                    COALESCE(eolk.PERENIMI, r.lastname) AS lastname,
-                    COALESCE(eolk.KLUBI, null) AS clubname,
-                    ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
-             FROM iofresults ir
-             JOIN iofevents e ON e.eventorId = ir.eventorId
-             JOIN iofrunners r ON r.iofId = ir.iofId
-             LEFT JOIN eolkoodid eolk ON eolk.IOFKOOD = ir.iofId
-             WHERE e.alatunnus = :alakood AND e.kuupaev BETWEEN :start AND :end'
-        );
+    // If the `eolkoodid` table cannot be converted at the DB level, force a proper
+    // interpretation of the stored bytes using CONVERT(... USING utf8mb4).
+    // Handle double-encoded UTF-8 by first converting to latin1 to get bytes, then to utf8
+    $stmt = $this->pdo->prepare(
+        "SELECT ir.iofId,
+            COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
+            COALESCE(eolk.PERENIMI, r.lastname) AS lastname,
+            COALESCE(eolk.KLUBI, NULL) AS clubname,
+            ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
+         FROM iofresults ir
+         JOIN iofevents e ON e.eventorId = ir.eventorId
+         JOIN iofrunners r ON r.iofId = ir.iofId
+         LEFT JOIN eolkoodid eolk ON eolk.IOFKOOD = ir.iofId
+         WHERE e.alatunnus = :alakood AND e.kuupaev BETWEEN :start AND :end"
+    );
         $stmt->execute([':alakood' => $alakood, ':start' => $startDate->format('Y-m-d'), ':end' => $endDate->format('Y-m-d')]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -86,12 +89,13 @@ class RankCalculator
                 'points' => $points,
             ];
             $byAthlete[$id]['iofId'] = (int)$row['iofId'];
-            $byAthlete[$id]['firstname'] = $row['firstname'];
-            $byAthlete[$id]['lastname'] = $row['lastname'];
-            $byAthlete[$id]['clubname'] = $row['clubname'] ?? null;
+            $byAthlete[$id]['firstname'] = mb_convert_encoding($row['firstname'], "ISO-8859-1", "UTF-8");
+            $byAthlete[$id]['lastname'] = mb_convert_encoding($row['lastname'], "ISO-8859-1", "UTF-8");
+            $byAthlete[$id]['clubname'] = mb_convert_encoding($row['clubname'], "ISO-8859-1", "UTF-8") ?? null;
             // map per-result Group into athlete-level sex/group; use first seen
             $byAthlete[$id]['group'] = $row['runnerGroup'] ?? null;
             $byAthlete[$id]['events'][] = $event;
+            // (no debug output)
         }
 
         $rankings = [];

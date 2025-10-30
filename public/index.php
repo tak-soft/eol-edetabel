@@ -190,7 +190,7 @@ if ($path === '/') {
     $page = 'overview';
     $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
 
-    $groups = [ 'WOMEN', 'MEN'];
+    $groups = ['WOMEN', 'MEN'];
     $overview = [];
 
     if (isset($pdo)) {
@@ -263,8 +263,8 @@ if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
         }
             */
     //  }
-    $disciplineName= $edetabliSeadedByYear[$year][$discipline]['nimetus'] ?? $discipline;
-    $viewData = ['discipline'=>$discipline, 'disciplineName' => $disciplineName, 'rankings' => $rankings ?? []];
+    $disciplineName = $edetabliSeadedByYear[$year][$discipline]['nimetus'] ?? $discipline;
+    $viewData = ['discipline' => $discipline, 'disciplineName' => $disciplineName, 'rankings' => $rankings ?? []];
     include __DIR__ . '/templates/discipline.php';
     exit;
 }
@@ -272,22 +272,39 @@ if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
 if (preg_match('#^/athlete/(\d+)$#', $path, $m)) {
     $iofId = $m[1];
     $page = 'athlete';
-    // Tudu: Loeme jooksja andmed EOLi tabelist eolkoodid ja iofrunners kui seal ei ole
-        $stmt2 = $pdo->prepare('SELECT ir.iofId, r.firstname, r.lastname, e.eventorId, e.nimetus, e.alatunnus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId JOIN iofrunners r ON r.iofId = ir.iofId WHERE r.iofId = :iofID ORDER BY e.kuupaev DESC');
-        $stmt2->execute([':iofID' => $iofId]);
-        $events = $stmt2->fetchAll();
-        $athletes = [];
-        foreach ($events as $ev) {
-            $id = (string)$ev['iofId'];
-            // set runner name from iofrunners
-            $athletes[$id]['firstname'] = $ev['firstname'] ?? ($athletes[$id]['firstname'] ?? '');
-            $athletes[$id]['lastname'] = $ev['lastname'] ?? ($athletes[$id]['lastname'] ?? '');
-            $athletes[$id]['events'][] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
-        }
-        // tudu: võistleja andmed eolkoodid tabelist
+    // Tehtud: Loeme jooksja andmed EOLi tabelist eolkoodid ja iofrunners kui seal ei ole'
+    $stmt = $pdo->prepare("SELECT 
+            COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
+            COALESCE(eolk.PERENIMI, r.lastname) AS lastname,
+            COALESCE(eolk.KLUBI, '') AS clubname,
+            COALESCE(eolk.SYNNIKUUP, NULL) AS birthdate,
+            COALESCE(eolk.FOTO, '') AS photo,
+            COALESCE(eolk.KOOD, '') AS eolKood
+            FROM iofrunners r  LEFT JOIN eolkoodid eolk ON eolk.IOFKOOD = r.iofId WHERE r.iofId = :iofID LIMIT 1");
+    $stmt->execute([':iofID' => $iofId]);
+    $athleteData = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($athleteData) {
+        $athlete = [
+            'iofId' => $iofId,
+            'eolKood' => $athleteData['eolKood'] ?? '',
+            'firstname' => mb_convert_encoding(($athleteData['firstname'] ?? ''), "ISO-8859-1", "UTF-8"),
+            'lastname' => mb_convert_encoding(($athleteData['lastname'] ?? ''), "ISO-8859-1", "UTF-8"),
+            'clubname' => mb_convert_encoding(($athleteData['clubname'] ?? ''), "ISO-8859-1", "UTF-8"),
+            'birthdate' => $athleteData['birthdate'] ?? '',
+            'photoUrl' => $athleteData['photo'] ?? '',
+            'age' => $athleteData['birthdate'] && $athleteData['birthdate']!='0000-00-00' ? (int)(date('Y') - (int)substr($athleteData['birthdate'], 0, 4)) : ''
+        ];
+    }
+    $stmt2 = $pdo->prepare('SELECT ir.iofId, e.eventorId, e.nimetus, e.alatunnus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId  WHERE ir.iofId = :iofID ORDER BY e.kuupaev DESC');
+    $stmt2->execute([':iofID' => $iofId]);
+    $eventsAll = $stmt2->fetchAll();
+    $events = [];
+    foreach ($eventsAll as $ev) {
+        $id = (string)$ev['iofId'];
+        $events[] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
+    }
 
-
-    $viewData = ['iofId' => $iofId, 'athlete' => ($athletes[$iofId] ?? null)];
+    $viewData = ['iofId' => $athlete['iofId'], 'athlete' => ($athlete ?? null), 'events' => $events ?? []];
     include __DIR__ . '/templates/athlete.php';
     exit;
 }

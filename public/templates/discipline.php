@@ -67,66 +67,72 @@
       }
     }
   }*/
+
+
   ?>
+
+    <header class="site-header">
+    <div class="site-header__inner">
+      <h1 class="site-logo" role="banner">
+        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/img/eol-new-logo.svg" alt="Estonian Orienteering Federation" height="30"><span class="sr-only">Estonian Orienteering Federation</span></a>
+      </h1>
+    </div>
+  </header>
 
   <section class="app-title">
     <h1 class="app-title__heading"><?php echo htmlspecialchars($viewData['disciplineName']); ?></h1>
   </section>
   <div class="container-xl disciplines-grid">
-    <div class="discipline-grid">
-      <section class="discipline-card edetabel-card">
-        <?php if (empty($filtered)): ?>
-          <p class="no-data"><em>Tulemused puuduvad</em></p>
-        <?php else: ?>
-          <h2 class="group-title"><?php echo $groups[$groupFilter]; ?></h2>
-          <?php $leader = $filtered[0]; ?>
-          <div class="leader leader-big">
-            <div class="leader-rank"><?php echo htmlspecialchars((string)($leader['place'] ?? '-')); ?></div>
-            <div class="leader-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></div>
-            <div class="leader-info">
-              <div class="leader-points"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? $leader['points'] ?? 0)); ?></div>
-              <div class="leader-links"><a class="profile-link" href="/athlete/<?php echo urlencode($leader['iofId']); ?>">vaata profiili</a></div>
-            </div>
+    <section class="discipline-card edetabel-card">
+      <?php if (empty($filtered)): ?>
+        <p class="no-data"><em>Tulemused puuduvad</em></p>
+      <?php else: ?>
+        <h3 class="group-title"><?php echo $groups[$groupFilter]; ?></h3>
+        <?php $leader = $filtered[0]; ?>
+        <div class="leader leader-big">
+          <div class="leader-rank">1</div>
+          <div class="leader-name"> <a href="/athlete/<?php echo urlencode($leader['iofId']); ?>">
+              <?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?>
+            </a></div>
+          <div class="leader-info">
+            <div class="leader-points sum"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? 0)); ?> punkti</div>
           </div>
+        </div>
 
-          <ol class="top-list compact">
-            <?php foreach ($filtered as $r): ?>
-              <li>
-                <span class="rank-num"><?php echo htmlspecialchars((string)($r['place'] ?? '-')); ?>.</span>
+        <div class="scoreboard-list top-list compact">
+          <?php foreach ($filtered as $r):
+            $counted = $r['countedEvents'] ?? ($r['events'] ?? []);
+            $parts = [];
+            foreach ($counted as $ev) {
+              $eid = isset($ev['eventorId']) ? (string)$ev['eventorId'] : null;
+              $pts = (int)($ev['points'] ?? 0);
+              $title = htmlspecialchars(($ev['date'] ?? '') . ' - ' . ($ev['name'] ?? ''));
+              $iofEventUrl = 'https://ranking.orienteering.org/ResultsView?event=' . urlencode($ev['eventorId']) . '&person=' . $r['iofId'] . '&ohow=' . $discipline;
+
+              $parts[] = '<a href="' . $iofEventUrl . '" class="event-points" title="' . $title . '">' . $pts . '</a>';
+            }
+            $eventsList = implode(' ', $parts);
+          ?>
+            <div class="scoreboard-list-item">
+              <div class="scoreboard-list-item__col-place"><?php echo htmlspecialchars((string)($r['place'] ?? '-')); ?>.</div>
+              <div class="scoreboard-list-item__col-name">
                 <a class="r-link" href="/athlete/<?php echo urlencode($r['iofId']); ?>">
                   <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
                 </a>
-                <span class="r-name"><?php echo ($r['clubname']) ?></span>
-                <span class="r-points"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?></span>
-                <div>
-                  <?php
-                  $counted = $r['countedEvents'] ?? ($r['events'] ?? []);
-                  //  print_r($counted);
-                  $parts = [];
-                  foreach ($counted as $ev) {
-                    $eid = isset($ev['eventorId']) ? (string)$ev['eventorId'] : null;
-                    /*
-                          if (!empty($eventDisciplineMap) && $eid !== null) {
-                              $eventAlat = $eventDisciplineMap[$eid] ?? null;
-                              if ($eventAlat !== null && $eventAlat !== ($viewData['code'] ?? null)) {
-                                  continue;
-                              }
-                          }*/
-                    $pts = (int)($ev['points'] ?? 0);
-                    $title = htmlspecialchars(($ev['date'] ?? '') . ' - ' . ($ev['name'] ?? ''));
-                    $iofEventUrl = 'https://ranking.orienteering.org/ResultsView?event=' . urlencode($ev['eventorId']) . '&person=' . $r['iofId'] . '&ohow=' . $discipline; 
- 
-                    $parts[] = '<a href="'.$iofEventUrl.'" class="event-points" title="' . $title . '">' . $pts . '</a>';
-                  }
-                  echo implode(' ', $parts);
-                  ?>
-                </div>
-              </li>
-            <?php endforeach; ?>
-          </ol>
-        <?php endif; ?>
+                <span class="mobile">
+                  <?php echo $eventsList; ?>
+                </span>
+              </div>
+              <div class="scoreboard-list-item__col-dob"><?php echo htmlspecialchars(substr($r['birthdate'] ?? '', 0, 4)); ?></div>
+              <div class="scoreboard-list-item__col-club"><?php echo ($r['clubname']) ?></div>
+              <div class="scoreboard-list-item__col-points"><span class="sum"><?php echo (string)($r['totalPoints'] ?? 0); ?></span>
+              </div>
+              <div class="scoreboard-list-item__col-points-from"><?php echo $eventsList; ?></div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </section>
-  </div>
 </body>
 
 </html>

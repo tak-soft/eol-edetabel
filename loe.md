@@ -39,3 +39,5 @@ Pühapäeval natuke üle tunni, et rakendus EOLi serveris käima panna.
 Reedel umbes 3 tundi, koodi ülevaatus ja täienduste tegemine käsitsi. EOLi stiilide kasutamine
 
 Laupäeval EOLi serveri uuendamine ja EOLi koodide andmebaasi kasutamine ning lõpuks 3 tundi et saaks erinevates kodeeringutes tabelitest andmed kokku. Käsitsi indeksite täiendamine.
+
+Neljapäeval EOLi andmebaasiga sidumine ning EOLi stiilide peale panemine, mis võttis omajagu aega.

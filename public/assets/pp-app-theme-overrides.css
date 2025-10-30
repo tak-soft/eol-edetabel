@@ -1,66 +1,273 @@
 /* Minimal overrides to layout discipline TOP10 columns side-by-side on wide screens */
-body { font-family: Arial, Helvetica, sans-serif; padding: 1rem; background: #f5f7f9; color: #222; }
-.disciplines-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1rem; align-items: start; grid-auto-rows: auto; align-content: start; }
-.discipline-card { border: 1px solid #e2e6ea; padding: 0.6rem; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,0.03); box-sizing: border-box; position: relative; display:flex; flex-direction:column; z-index:0; overflow: visible; min-height:0; isolation:isolate; }
-.edetabel-card { border-radius: 4px; }
-.discipline-title { margin: 0 0 0.6rem 0; font-size: 1.15rem; color: #0b4d80; }
-.discipline-grid { display: flex; flex-direction: column; gap: 0.8rem; min-height: 0; flex: 0 0 auto; overflow: visible; }
-.group-column { border-top: 1px dashed #eee; padding-top: 0.6rem; }
-.group-column { min-height: 0; }
-.group-title { margin: 0 0 0.35rem 0; font-size: 1.5rem; color: #555; }
-.leader { border: 1px solid #e6eef6; padding: 0.6rem; background: linear-gradient(180deg,#ffffff,#f7fbff); margin-bottom: 0.6rem; display:flex; align-items:center; min-width:0; justify-content: space-between;}
-.leader-big { padding: 0.4rem; }
-.leader-rank { font-size: 1.6rem; font-weight:700; color:#0b4d80; width:48px; text-align:center; }
-.leader-info { margin-left:0.6rem; display:flex; align-items:center; gap:0.6rem; }
-.leader-name { font-weight:700; font-size:1rem; }
-.leader-points { color:#0b4d80; font-weight:600; margin-left:auto; }
-.leader-links .profile-link { font-size:0.85rem; color:#0b4d80; text-decoration:none; }
-.top-list { margin: 0; padding-left: 0; list-style: none; }
- .top-list.compact li { display:flex; align-items:center; gap:0.6rem; padding:0.25rem 0; border-bottom:1px solid #f0f0f0; justify-content:space-between; }
-.rank-num { width:28px; color:#777; }
-.r-name { flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.r-points { color:#0b4d80; margin-left:0.5rem; font-weight:600; white-space:nowrap; min-width:64px; text-align:right; }
-.r-link { margin-left:0.6rem; color:#0b4d80; text-decoration:none; font-size:0.85rem; width: 130px;  }
-.no-data { color: #888; font-style:italic; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 1rem;
+  color: #222;
+}
+
+.disciplines-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
+  grid-auto-rows: auto;
+  align-content: start;
+}
+
+.discipline-card {
+  border: 1px solid #e2e6ea;
+  padding: 0.6rem;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+  overflow: visible;
+  min-height: 0;
+  isolation: isolate;
+}
+
+.edetabel-card {
+  border-radius: 4px;
+}
+
+.discipline-title {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.15rem;
+  color: #0b4d80;
+}
+
+.discipline-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-height: 0;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.group-column {
+  border-top: 1px dashed #eee;
+  padding-top: 0.6rem;
+}
+
+.group-column {
+  min-height: 0;
+}
+
+.group-title {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.leader {
+    background: linear-gradient(180deg, #ffffff, #c9d89e);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    font-size: 2rem;
+    gap: 2rem;
+    justify-content: flex-start;
+}
+
+.leader-big {
+  padding: 0.4rem;
+}
+
+.leader-rank {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0b4d80;
+  width: 48px;
+  text-align: center;
+  background: gold;
+  border: solid 1px yellow;
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+}
+
+.leader-info {
+  margin-left: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.leader-name {
+  font-weight: 700;
+}
+
+.leader-points {
+  color: #0b4d80;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.leader-links .profile-link {
+  font-size: 0.85rem;
+  color: #0b4d80;
+  text-decoration: none;
+}
+
+.top-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.top-list.compact li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  justify-content: space-between;
+}
+
+.rank-num {
+  width: 28px;
+  color: #777;
+}
+
+.r-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r-points {
+  color: #0b4d80;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 64px;
+  text-align: right;
+}
+
+.r-link {
+  margin-left: 0.6rem;
+  color: #0b4d80;
+  text-decoration: none;
+  font-size: 0.85rem;
+  width: 130px;
+}
+
+.no-data {
+  color: #888;
+  font-style: italic;
+}
 
 /* At wider screens show WOMEN and MEN side-by-side */
-@media (min-width: 600px) {
-  .discipline-grid { flex-direction: row; }
-  .group-column { flex: 1 1 50%; border-top: none; padding: 0.6rem; }
-  .group-column + .group-column { border-left: 1px solid #f5f7f9; }
+@media (min-width: 660px) {
+  .discipline-grid {
+    flex-direction: row;
+  }
+
+  .group-column {
+    flex: 1 1 50%;
+    border-top: none;
+    padding: 0.6rem;
+  }
+
+  .group-column+.group-column {
+    border-left: 1px solid #f5f7f9;
+  }
+
+
 }
 
 /* Force single column on small screens up to 900px to avoid overlap at intermediate widths */
 @media (max-width: 1200px) {
-  .disciplines-grid { grid-template-columns: 1fr; }
+  .disciplines-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Two-column layout for medium screens between 900px and 1199px */
 @media (min-width: 1201px) and (max-width: 1499px) {
-  .disciplines-grid { grid-template-columns: repeat(2, 1fr); }
+  .disciplines-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* On larger screens constrain card height and allow internal scrolling for long columns */
 @media (min-width: 1500px) {
-  .discipline-grid { overflow: hidden; }
-  .group-column { overflow: auto; }
+  .discipline-grid {
+    overflow: hidden;
+  }
+
+  .group-column {
+    overflow: auto;
+  }
 
   /* subtle scrollbar styling (Webkit) */
-  .group-column::-webkit-scrollbar { width: 8px; height: 8px; }
-  .group-column::-webkit-scrollbar-thumb { background: rgba(11,77,128,0.18); border-radius: 4px; }
-  .group-column::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
+  .group-column::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .group-column::-webkit-scrollbar-thumb {
+    background: rgba(11, 77, 128, 0.18);
+    border-radius: 4px;
+  }
+
+  .group-column::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+  }
 }
 
 /* On small screens allow natural expansion (no internal scrolling) */
 @media (max-width: 1119px) {
-  .group-column { overflow: visible; max-height: none; }
-  .discipline-card { max-height: none; }
+  .group-column {
+    overflow: visible;
+    max-height: none;
+  }
+
+  .discipline-card {
+    max-height: none;
+  }  .leader-big {
+    font-size: 1.6rem;
+  }
 }
 
-.full-table { margin-top: 0.5rem; }
-.full-table-link { display:inline-block; padding:0.35rem 0.6rem; background:#0b4d80; color:#fff; text-decoration:none; border-radius:3px; font-size:0.9rem; }
-.full-table-link:hover { background:#093a5f; }
+.full-table {
+  margin-top: 0.5rem;
+}
+
+.full-table-link {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  background: #0b4d80;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.9rem;
+}
+
+.full-table-link:hover {
+  background: #093a5f;
+  color: #fff;
+}
 
 /* Chips for counted event points in discipline table */
-.event-points { display:inline-block; padding:0.15rem 0.35rem; margin-right:0.35rem; background:#f2f6fb; border:1px solid #e0eaf6; border-radius:3px; font-size:0.85rem; color:#0b4d80; }
-.event-points[title] { cursor: help; }
+.event-points {
+  display: inline-block;
+  padding: 0.15rem 0.35rem;
+  margin-right: 0.35rem;
+  background: #f2f6fb;
+  border: 1px solid #e0eaf6;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #0b4d80;
+}
+
+.event-points[title] {
+  cursor: help;
+}

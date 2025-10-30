@@ -52,7 +52,7 @@ class RankCalculator
         }
         $startDate = $endDate->sub(new DateInterval('P' . max(1, $periodMonths) . 'M'));
 
-//      echo "Computing rankings for discipline $alakood from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . ", taking best " . ($takeBest > 0 ? $takeBest : 'all') . " results per athlete.\n";
+        //      echo "Computing rankings for discipline $alakood from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . ", taking best " . ($takeBest > 0 ? $takeBest : 'all') . " results per athlete.\n";
 
         // fetch relevant results in window
         // Note: Group (MEN/WOMEN) is stored per-result in iofresults as `Group`.
@@ -60,21 +60,22 @@ class RankCalculator
         // TEHTUD: Kui eolkoodid tabelis on IOFKOOD järgi kirje olemas, siis võta sealt firstname/lastname asemel EESNIMI/PERENIMI.
         // Prefer names from `eolkoodid` (EESNIMI/PERENIMI) when a record exists for the IOF id (IOFKOOD).
         // Fallback to iofrunners.firstname / iofrunners.lastname when no eolkoodid entry.
-    // If the `eolkoodid` table cannot be converted at the DB level, force a proper
-    // interpretation of the stored bytes using CONVERT(... USING utf8mb4).
-    // Handle double-encoded UTF-8 by first converting to latin1 to get bytes, then to utf8
-    $stmt = $this->pdo->prepare(
-        "SELECT ir.iofId,
+        // If the `eolkoodid` table cannot be converted at the DB level, force a proper
+        // interpretation of the stored bytes using CONVERT(... USING utf8mb4).
+        // Handle double-encoded UTF-8 by first converting to latin1 to get bytes, then to utf8
+        $stmt = $this->pdo->prepare(
+            "SELECT ir.iofId,
             COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
             COALESCE(eolk.PERENIMI, r.lastname) AS lastname,
-            COALESCE(eolk.KLUBI, NULL) AS clubname,
+            COALESCE(eolk.KLUBI, '') AS clubname,
+            COALESCE(eolk.SYNNIKUUP, NULL) AS birthdate,
             ir.`Group` AS runnerGroup, ir.RankPoints, e.eventorId, e.kuupaev, e.nimetus
          FROM iofresults ir
          JOIN iofevents e ON e.eventorId = ir.eventorId
          JOIN iofrunners r ON r.iofId = ir.iofId
          LEFT JOIN eolkoodid eolk ON eolk.IOFKOOD = ir.iofId
          WHERE e.alatunnus = :alakood AND e.kuupaev BETWEEN :start AND :end"
-    );
+        );
         $stmt->execute([':alakood' => $alakood, ':start' => $startDate->format('Y-m-d'), ':end' => $endDate->format('Y-m-d')]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -91,9 +92,10 @@ class RankCalculator
             $byAthlete[$id]['iofId'] = (int)$row['iofId'];
             $byAthlete[$id]['firstname'] = mb_convert_encoding($row['firstname'], "ISO-8859-1", "UTF-8");
             $byAthlete[$id]['lastname'] = mb_convert_encoding($row['lastname'], "ISO-8859-1", "UTF-8");
-            $byAthlete[$id]['clubname'] = mb_convert_encoding($row['clubname'], "ISO-8859-1", "UTF-8") ?? null;
+            $byAthlete[$id]['clubname'] = mb_convert_encoding($row['clubname'], "ISO-8859-1", "UTF-8");
             // map per-result Group into athlete-level sex/group; use first seen
-            $byAthlete[$id]['group'] = $row['runnerGroup'] ?? null;
+            $byAthlete[$id]['group'] = $row['runnerGroup'];
+            $byAthlete[$id]['birthdate'] = $row['birthdate'];;
             $byAthlete[$id]['events'][] = $event;
             // (no debug output)
         }

@@ -36,49 +36,6 @@ if (file_exists($rootEnvFile)) {
 }
 $dotenv->safeLoad();
 
-// try to connect to DB; if unavailable, fall back to sample data
-/*
-$dataStore = ['rankings' => [], 'athletes' => []];
-try {
-    if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
-        $db = new Eol\Edetabel\Database($_ENV);
-        $pdo = $db->getPdo();
-
-        // Simple aggregation: select top runners by sum of RankPoints grouped by iofId
-        // Group (MEN/WOMEN) is stored per-result in iofresults; take any value (MAX) as representative
-        $stmt = $pdo->prepare('SELECT r.iofId, r.firstname, r.lastname, MAX(ir.`Group`) AS group, SUM(ir.RankPoints) AS points FROM iofrunners r JOIN iofresults ir ON r.iofId = ir.iofId GROUP BY r.iofId ORDER BY points DESC LIMIT 100');
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
-        $rankings = [];
-        $place = 1;
-        foreach ($rows as $row) {
-            $rankings[] = ['place' => $place++, 'firstname' => $row['firstname'], 'lastname' => $row['lastname'], 'iofId' => (int)$row['iofId'], 'points' => (float)$row['points'], 'group' => $row['group']];
-        }
-
-        // athletes: map iofId -> events
-        $stmt2 = $pdo->query('SELECT ir.iofId, r.firstname, r.lastname, e.eventorId, e.nimetus, e.alatunnus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId JOIN iofrunners r ON r.iofId = ir.iofId ORDER BY e.kuupaev DESC');
-        $events = $stmt2->fetchAll();
-        $athletes = [];
-        foreach ($events as $ev) {
-            $id = (string)$ev['iofId'];
-            // set runner name from iofrunners
-            $athletes[$id]['firstname'] = $ev['firstname'] ?? ($athletes[$id]['firstname'] ?? '');
-            $athletes[$id]['lastname'] = $ev['lastname'] ?? ($athletes[$id]['lastname'] ?? '');
-            $athletes[$id]['events'][] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
-        }
-
-        $dataStore = ['rankings' => $rankings, 'athletes' => $athletes];
-    }
-} catch (Throwable $e) {
-    // fallback to sample data file
-    $file = __DIR__ . '/../data/sample.json';
-    if (file_exists($file)) {
-        $json = file_get_contents($file);
-        $data = json_decode($json, true);
-        $dataStore = is_array($data) ? $data : $dataStore;
-    }
-}
-    */
 if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
     $db = new Eol\Edetabel\Database($_ENV);
     $pdo = $db->getPdo();
@@ -146,21 +103,6 @@ if (str_starts_with($path, '/api/')) {
                 exit;
             }
         }
-        /*
-        // fallback to sample or precomputed dataStore
-        $rows = $dataStore['rankings'] ?? [];
-        $filtered = array_filter($rows, function ($r) use ($discipline, $group) {
-            if ($discipline && (!isset($r['discipline']) || $r['discipline'] !== $discipline)) return false;
-            if ($group && (!isset($r['group']) || $r['group'] !== $group)) return false;
-            return true;
-        });
-        // sort by place
-        usort($filtered, function ($a, $b) {
-            return ($a['place'] ?? 0) <=> ($b['place'] ?? 0);
-        });
-        $paged = array_slice($filtered, $offset, $limit);
-        echo json_encode(array_values($paged));
-*/
         echo [];
         exit;
     }
@@ -168,10 +110,6 @@ if (str_starts_with($path, '/api/')) {
     // athlete endpoint: /api/athlete/{iofId}
     if (preg_match('#^/api/athlete/(\d+)$#', $path, $m)) {
         $iofId = $m[1];
-        // Tudu: Loeme jooksja andmed EOLi tabelist eolkoodid ja iofrunners kui seal ei ole
-        // Peab arvutama tema edetabeli punktid RankCalculatoriga?
-        // Jooksja tulemused loeb samuti DBst.
-
         if (!$ath) {
             echo json_encode([]);
             exit;
@@ -223,19 +161,7 @@ if ($path === '/') {
                 $overview[$d][$s] = array_slice($filtered, 0, 10);
             }
         }
-    } /* else {
-        // fallback to sample dataStore grouping
-        $disciplines = ['F','FS','M','S'];
-        $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Sprint', 'M' => 'Rattaorienteerumine', 'S' => 'Suusaorienteerumine'];
-        foreach ($disciplines as $d) {
-            foreach ($groupes as $s) {
-                $rows = array_filter($dataStore['rankings'] ?? [], function($r) use ($d, $s) { return ($r['discipline'] ?? $d) === $d && ($r['group'] ?? $s) === $s; });
-                usort($rows, function($a,$b){ return ($b['points'] <=> $a['points']); });
-                $overview[$d][$s] = array_slice(array_values($rows), 0, 10);
-            }
-        }
-    }*/
-
+    } 
     $viewData = [
         'overview' => $overview,
         'year' => $year,
@@ -250,19 +176,10 @@ if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
     $discipline = $m[1];
     $page = 'discipline';
     $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
-    //  if (isset($pdo)) {
-    // Tudu: See tuleb ümber teha RankCalculatorisse!
+    // Tehtud: See tuleb ümber teha RankCalculatorisse!
     $calc = new Eol\Edetabel\RankCalculator($pdo);
     $rankings = $calc->computeForAlakoodYear($discipline, $year);
-    /*
-        $stmt = $pdo->prepare('SELECT nimetus FROM edetabli_seaded WHERE alakood = :alakood AND aasta = :aasta LIMIT 1');
-        $stmt->execute([':alakood' => $code, ':aasta' => $year]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row && !empty($row['nimetus'])) {
-            $disciplineName = $row['nimetus'];
-        }
-            */
-    //  }
+
     $disciplineName = $edetabliSeadedByYear[$year][$discipline]['nimetus'] ?? $discipline;
     $viewData = ['discipline' => $discipline, 'disciplineName' => $disciplineName, 'rankings' => $rankings ?? []];
     include __DIR__ . '/templates/discipline.php';

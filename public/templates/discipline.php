@@ -18,20 +18,7 @@
   $groupFilter = $_GET['group'] ?? null;
   $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
   $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
-  /*
-  if (empty($rankings) && class_exists('\Eol\Edetabel\RankCalculator') && isset($pdo)) {
-      try {
-          $calc = new \Eol\Edetabel\RankCalculator($pdo);
-          $setting = $calc->loadSettingByAlakoodAndYear($viewData['code'], $year);
-          if ($setting) {
-              $rankings = $calc->computeForSetting($setting);
-          }
-      } catch (Throwable $e) {
-          // ignore and fall back to provided data
-      }
-  }
-*/
-  // Tudu: Filtreeri ala järgi juba RankCalculatoris
+
   // filter by discipline code if rankings come from a generic precomputed source
   $filtered = [];
   foreach ($rankings as $r) {
@@ -43,31 +30,6 @@
   usort($filtered, function ($a, $b) {
     return (($a['place'] ?? PHP_INT_MAX) <=> ($b['place'] ?? PHP_INT_MAX));
   });
-
-  // If we have a PDO instance, batch-resolve eventorId -> alatunnus so we can show only events from this discipline
-  /*$eventDisciplineMap = [];
-  if (isset($pdo)) {
-    $allEventIds = [];
-    foreach ($filtered as $r) {
-      $counted = $r['countedEvents'] ?? ($r['events'] ?? []);
-      foreach ($counted as $ev) {
-        if (!empty($ev['eventorId'])) $allEventIds[(string)$ev['eventorId']] = true;
-      }
-    }
-    $ids = array_keys($allEventIds);
-    if (!empty($ids)) {
-      // build placeholders
-      $placeholders = implode(',', array_fill(0, count($ids), '?'));
-      $sql = 'SELECT eventorId, alatunnus FROM iofevents WHERE eventorId IN (' . $placeholders . ')';
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute($ids);
-      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      foreach ($rows as $row) {
-        $eventDisciplineMap[(string)$row['eventorId']] = $row['alatunnus'] ?? null;
-      }
-    }
-  }*/
-
 
   ?>
 

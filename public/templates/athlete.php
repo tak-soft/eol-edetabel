@@ -29,17 +29,16 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Orienteeruja tulemused : <?php echo htmlspecialchars($viewData['iofId']); ?></title>
+  <title>Edetabeli tulemused: <?php echo htmlspecialchars($viewData['athlete']['firstname'] . ' ' . $viewData['athlete']['lastname']); ?></title>
   <link rel="stylesheet" href="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/css/pp-app-theme.css">
   <link rel="stylesheet" href="/assets/pp-app-theme-overrides.css">
 </head>
 
 <body>
-
-  <header class="site-header">
+   <header class="site-header">
     <div class="site-header__inner">
       <h1 class="site-logo" role="banner">
-        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/img/eol-new-logo.svg" alt="Estonian Orienteering Federation" height="30"><span class="sr-only">Estonian Orienteering Federation</span></a>
+                <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="/assets/eol-logo.png" alt="Eesti Orienteerumisliit" height="50"><span class="sr-only">Estonian Orienteering Federation</span></a>
       </h1>
     </div>
   </header>
@@ -92,8 +91,8 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
           <ol class="top-list">
             <?php foreach ($viewData['events'] ?? [] as $e): ?>
               <li>
-                <div style="display:flex; align-items:center; gap:0.6rem; width:100%; font-size:1.6rem;align-items: flex-start;">
-                  <div style="flex:1 1 auto; min-width:0;">
+                <div class="athlete-result-item">
+                  <div class="athlete-result-layout">
                     <div style="font-weight:600;">
                       <?php if (!empty($e['eventorId'])): ?>
                         <?php $iofEventUrl = 'https://ranking.orienteering.org/ResultsView?event=' . urlencode($e['eventorId']) . '&person=' . urlencode($viewData['iofId']) . '&ohow=' . urlencode($e['alatunnus'] ?? ''); ?>
@@ -102,11 +101,11 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
                         <?php echo htmlspecialchars($e['name'] ?? ''); ?>
                       <?php endif; ?>
                     </div>
-                    <div style="font-size:0.85em; color:#666;">
+                    <div class="athlete-result-details">
                       <?php echo htmlspecialchars($e['date'] ?? ''); ?> — tulemus: <?php echo intTimeToString($e['result']); ?> koht: <?php echo htmlspecialchars((string)($e['place'] ?? '')); ?> ala: <?php echo $disciplineNames[$e['alatunnus'] ?? '']; ?>
                     </div>
                   </div>
-                  <div style="min-width:64px; text-align:right; font-weight:600; color:#0b4d80;">
+                  <div class="summ">
                     <?php echo htmlspecialchars((string)($e['points'] ?? '0')); ?>
                   </div>
                 </div>
@@ -118,6 +117,7 @@ $disciplineNames = ['F' => 'Orienteerumisjooks', 'FS' => 'Orienteerumisjooks - S
     </div>
     </div>
   <?php endif; ?>
+<?php include __DIR__ . '/footer.php'; ?>
 </body>
 
 </html>

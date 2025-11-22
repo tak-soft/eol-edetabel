@@ -64,14 +64,18 @@ body {
 }
 
 .leader {
-    background: linear-gradient(180deg, #ffffff, #c9d89e);
-    margin-bottom: 0.6rem;
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    font-size: 2rem;
-    gap: 2rem;
-    justify-content: flex-start;
+  background: linear-gradient(180deg, #ffffff, #c9d89e);
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font-size: 2rem;
+  gap: 2rem;
+  justify-content: flex-start;
+}
+
+.leader-overview {
+  background: linear-gradient(180deg, #ffffff, #c9d89e);
 }
 
 .leader-big {
@@ -232,7 +236,9 @@ body {
 
   .discipline-card {
     max-height: none;
-  }  .leader-big {
+  }
+
+  .leader-big {
     font-size: 1.6rem;
   }
 }
@@ -270,4 +276,23 @@ body {
 
 .event-points[title] {
   cursor: help;
+}
+
+.athlete-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  font-size: 1.2rem;
+  align-items: flex-start;
+}
+
+.athlete-result-details {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.athlete-result-layout {
+  flex: 1 1 auto;
+  min-width: 0;
 }

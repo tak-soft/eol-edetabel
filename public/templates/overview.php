@@ -11,14 +11,13 @@
 
 <body>
 
-  <header class="site-header">
+   <header class="site-header">
     <div class="site-header__inner">
       <h1 class="site-logo" role="banner">
-        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/img/eol-new-logo.svg" alt="Estonian Orienteering Federation" height="30"><span class="sr-only">Estonian Orienteering Federation</span></a>
+        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="/assets/eol-logo.png" alt="Eesti Orienteerumisliit" height="50"><span class="sr-only">Estonian Orienteering Federation</span></a>
       </h1>
     </div>
   </header>
-
 
   <section class="app-title">
     <h1 class="app-title__heading">EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
@@ -49,7 +48,7 @@
                 <?php else: ?>
                   <div class="scoreboard-list">
                     <?php $leader = $rows[0]; ?>
-                    <div class="scoreboard-list-item leader">
+                    <div class="scoreboard-list-item leader-overview">
                       <div class="scoreboard-list-item__col-place"><?php $place = $leader['place'] ?? "-";
                                                                     echo (string)$place;  ?></div>
                       <div class="scoreboard-list-item__col-name">
@@ -84,6 +83,7 @@
       </section>
     <?php endforeach; ?>
   </div>
+  <?php include __DIR__ . '/footer.php'; ?>
 </body>
 
 </html>

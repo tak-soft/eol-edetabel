@@ -10,8 +10,7 @@
 </head>
 
 <body>
-  <?php
-  // If viewData['rankings'] is empty or not provided, try to compute via RankCalculator
+  <?php // If viewData['rankings'] is empty or not provided, try to compute via RankCalculator
   $rankings = $viewData['rankings'] ?? [];
   $discipline = $viewData['discipline'] ?? "";
   // Support optional filtering by sex via query param
@@ -33,10 +32,10 @@
 
   ?>
 
-    <header class="site-header">
+   <header class="site-header">
     <div class="site-header__inner">
       <h1 class="site-logo" role="banner">
-        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="https://orienteerumine.ee/wp-content/themes/eol/assets/dist/img/eol-new-logo.svg" alt="Estonian Orienteering Federation" height="30"><span class="sr-only">Estonian Orienteering Federation</span></a>
+        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="/assets/eol-logo.png" alt="Eesti Orienteerumisliit" height="50"><span class="sr-only">Estonian Orienteering Federation</span></a>
       </h1>
     </div>
   </header>
@@ -95,6 +94,8 @@
         </div>
       <?php endif; ?>
     </section>
+  </div>
+  <?php include __DIR__ . '/footer.php'; ?>
 </body>
 
 </html>

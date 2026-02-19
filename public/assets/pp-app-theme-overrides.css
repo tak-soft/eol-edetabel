@@ -287,12 +287,40 @@ body {
   align-items: flex-start;
 }
 
+.athlete-result-item--selected {
+  font-weight: 600;
+}
+
+.athlete-results-list li {
+  padding: 0.25rem 0.35rem;
+}
+
+.athlete-results-list li:nth-child(odd) {
+  background: rgba(11, 77, 128, 0.05);
+}
+
 .athlete-result-details {
   font-size: 0.85em;
   color: #666;
 }
 
 .athlete-result-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.athlete-result-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.athlete-result-title {
+  font-weight: 600;
+}
+
+.athlete-result-discipline-icon {
+  flex: 0 0 auto;
 }

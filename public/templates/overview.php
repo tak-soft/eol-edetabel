@@ -11,21 +11,23 @@
 
 <body>
 
-   <header class="site-header">
+  <header class="site-header">
     <div class="site-header__inner">
       <h1 class="site-logo" role="banner">
-        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="/assets/eol-logo.png" alt="Eesti Orienteerumisliit" height="50"><span class="sr-only">Estonian Orienteering Federation</span></a>
+        <a class="site-logo__link" href="https://orienteerumine.ee" rel="home"><img src="/assets/eol-logo.png"
+            alt="Eesti Orienteerumisliit" height="50"><span class="sr-only">Estonian Orienteering Federation</span></a>
       </h1>
     </div>
   </header>
 
   <section class="app-title">
-    <h1 class="app-title__heading">EOL Edetabel — <?php echo htmlspecialchars((string)$viewData['year']); ?></h1>
+    <h1 class="app-title__heading">EOL Edetabel — <?php echo htmlspecialchars((string) $viewData['year']); ?></h1>
   </section>
   <nav class="nav-national-team">
     <?php
     // Use discipline names provided by controller (from edetabli_seaded) when available
     $disciplineNames = $viewData['disciplineNames'];
+    $disciplineIcons = $viewData['disciplineIcons'] ?? [];
     $periods = $viewData['periods'] ?? [];
     $groups = ['WOMEN' => 'Naised', 'MEN' => 'Mehed'];
     foreach ($periods as $key => $value) {
@@ -34,52 +36,70 @@
     }
     ?>
   </nav>
+  <section class="container-xl">
+    <?php foreach ($disciplineIcons as $code => $icon): ?>
+      <?php $name = $disciplineNames[$code] ?? $code; ?>
+      <a class="menu-item menu-item-type-post_type" href="#<?php echo urlencode($code); ?>"><img src="/assets/<?php echo htmlspecialchars($icon); ?>"
+          alt="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></a>
+    <?php endforeach; ?>
+  </section>
+
   <div class="container-xl disciplines-grid">
     <?php foreach ($viewData['overview'] as $discipline => $bygroup): ?>
       <section class="discipline-card edetabel-card">
-        <h3 class="scoreboard-list-subtitle"><?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h2>
-          <div class="discipline-grid">
-            <?php foreach (['WOMEN', 'MEN'] as $groupKey): ?>
-              <?php $rows = $bygroup[$groupKey] ?? []; ?>
-              <div class="group-column">
-                <h3 class="group-title"><?php echo $groups[$groupKey]; ?></h3>
-                <?php if (empty($rows)): ?>
-                  <p class="no-data"><em>Tulemused puuduvad</em></p>
-                <?php else: ?>
-                  <div class="scoreboard-list">
-                    <?php $leader = $rows[0]; ?>
-                    <div class="scoreboard-list-item leader-overview">
-                      <div class="scoreboard-list-item__col-place"><?php $place = $leader['place'] ?? "-";
-                                                                    echo (string)$place;  ?></div>
+        <h3 class="scoreboard-list-subtitle"><img
+            src="./assets/<?php echo $disciplineIcons[$discipline] ?? ''; ?>"
+            alt="<?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?>">
+          <?php echo htmlspecialchars($disciplineNames[$discipline] ?? $discipline); ?></h3>
+        <a name="<?php echo urlencode($discipline); ?>"></a>
+        <div class="discipline-grid">
+          <?php foreach (['WOMEN', 'MEN'] as $groupKey): ?>
+            <?php $rows = $bygroup[$groupKey] ?? []; ?>
+            <div class="group-column">
+              <h3 class="group-title"><?php echo $groups[$groupKey]; ?></h3>
+              <?php if (empty($rows)): ?>
+                <p class="no-data"><em>Tulemused puuduvad</em></p>
+              <?php else: ?>
+                <div class="scoreboard-list">
+                  <?php $leader = $rows[0]; ?>
+                  <div class="scoreboard-list-item leader-overview">
+                    <div class="scoreboard-list-item__col-place"><?php $place = $leader['place'] ?? "-";
+                    echo (string) $place; ?></div>
+                    <div class="scoreboard-list-item__col-name">
+                      <a href="/athlete/<?php echo urlencode($leader['iofId']); ?>">
+                        <span
+                          class="r-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></span>
+                      </a>
+                    </div>
+                    <div class="scoreboard-list-item__col-points"><span
+                        class="sum"><?php echo htmlspecialchars((string) ($leader['totalPoints'] ?? 0)); ?></span> </div>
+                  </div>
+
+                  <?php foreach (array_slice($rows, 1, 10) as $idx => $r): ?>
+                    <div class="scoreboard-list-item">
+                      <div class="scoreboard-list-item__col-place"><?php $place = $r['place'] ?? "-";
+                      echo (string) $place; ?></div>
                       <div class="scoreboard-list-item__col-name">
-                        <a href="/athlete/<?php echo urlencode($leader['iofId']); ?>">
-                          <span class="r-name"><?php echo htmlspecialchars($leader['firstname'] . ' ' . $leader['lastname']); ?></span>
+                        <a href="/athlete/<?php echo urlencode($r['iofId']); ?>">
+                          <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
                         </a>
                       </div>
-                      <div class="scoreboard-list-item__col-points"><span class="sum"><?php echo htmlspecialchars((string)($leader['totalPoints'] ?? 0)); ?></span> </div>
-                    </div>
-
-                    <?php foreach (array_slice($rows, 1, 10) as $idx => $r): ?>
-                      <div class="scoreboard-list-item">
-                        <div class="scoreboard-list-item__col-place"><?php $place = $r['place'] ?? "-";
-                                                                      echo (string)$place;  ?></div>
-                        <div class="scoreboard-list-item__col-name">
-                          <a href="/athlete/<?php echo urlencode($r['iofId']); ?>">
-                            <span class="r-name"><?php echo htmlspecialchars($r['firstname'] . ' ' . $r['lastname']); ?></span>
-                          </a>
-                        </div>
-                        <div class="scoreboard-list-item__col-points"><span class="sum"><?php echo htmlspecialchars((string)($r['totalPoints'] ?? $r['points'] ?? 0)); ?></span> </div>
+                      <div class="scoreboard-list-item__col-points"><span
+                          class="sum"><?php echo htmlspecialchars((string) ($r['totalPoints'] ?? $r['points'] ?? 0)); ?></span>
                       </div>
-                    <?php endforeach; ?>
-                  </div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
 
-                  <div class="full-table">
-                    <a class="full-table-link" href="/discipline/<?php echo urlencode($discipline); ?>?group=<?php echo urlencode($groupKey); ?>&amp;year=<?php echo urlencode((string)$viewData['year']); ?>">Täielik tabel</a>
-                  </div>
-                <?php endif; ?>
-              </div>
-            <?php endforeach; ?>
-          </div>
+                <div class="full-table">
+                  <a class="full-table-link"
+                    href="/discipline/<?php echo urlencode($discipline); ?>?group=<?php echo urlencode($groupKey); ?>&amp;year=<?php echo urlencode((string) $viewData['year']); ?>">Täielik
+                    tabel</a>
+                </div>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
       </section>
     <?php endforeach; ?>
   </div>

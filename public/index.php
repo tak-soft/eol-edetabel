@@ -36,6 +36,8 @@ if (file_exists($rootEnvFile)) {
 }
 $dotenv->safeLoad();
 
+$disciplineIcons = ['F' => 'oj_pikto.png', 'FS' => 'oj_pikto.png', 'M' => 'ro_pikto.png', 'S' => 'so_pikto.png'];
+
 if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
     $db = new Eol\Edetabel\Database($_ENV);
     $pdo = $db->getPdo();
@@ -50,8 +52,9 @@ if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
     if (is_array($rows)) {
         foreach ($rows as $row) {
             // expect column "aasta"
-            if (!isset($row['aasta'])) continue;
-            $aasta = (int)$row['aasta'];
+            if (!isset($row['aasta']))
+                continue;
+            $aasta = (int) $row['aasta'];
             $d = $row['alakood'] ?? null;
             $edetabliSeadedByYear[$aasta][$d] = $row;
             $edetabliAvailableYears[$aasta] = $aasta;
@@ -65,7 +68,8 @@ if (!empty($_ENV['DB_HOST'] ?? '') && !empty($_ENV['DB_NAME'] ?? '')) {
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $rawPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 $path = rtrim($rawPath, '/');
-if ($path === '') $path = '/';
+if ($path === '')
+    $path = '/';
 
 // Health check
 if ($path === '/health') {
@@ -82,9 +86,9 @@ if (str_starts_with($path, '/api/')) {
         $q = $_GET;
         $discipline = $q['discipline'] ?? null;
         $group = $q['group'] ?? null;
-        $limit = isset($q['limit']) ? (int)$q['limit'] : 50;
-        $offset = isset($q['offset']) ? (int)$q['offset'] : 0;
-        $year = isset($q['year']) ? (int)$q['year'] : (int)date('Y');
+        $limit = isset($q['limit']) ? (int) $q['limit'] : 50;
+        $offset = isset($q['offset']) ? (int) $q['offset'] : 0;
+        $year = isset($q['year']) ? (int) $q['year'] : (int) date('Y');
 
         // If DB is configured and discipline provided, compute using RankCalculator and edetabli_seaded
         if (isset($pdo) && $discipline) {
@@ -103,7 +107,7 @@ if (str_starts_with($path, '/api/')) {
                 exit;
             }
         }
-        echo [];
+        echo json_encode([]);
         exit;
     }
 
@@ -126,7 +130,7 @@ if (str_starts_with($path, '/api/')) {
 // Page routes (server-side rendered templates)
 if ($path === '/') {
     $page = 'overview';
-    $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+    $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
 
     $groups = ['WOMEN', 'MEN'];
     $overview = [];
@@ -161,12 +165,13 @@ if ($path === '/') {
                 $overview[$d][$s] = array_slice($filtered, 0, 10);
             }
         }
-    } 
+    }
     $viewData = [
         'overview' => $overview,
         'year' => $year,
         'disciplineNames' => $disciplineNames ?? [],
-        'periods' => $edetabliAvailableYears
+        'periods' => $edetabliAvailableYears,
+        'disciplineIcons' => $disciplineIcons ?? [],
     ];
     include __DIR__ . '/templates/overview.php';
     exit;
@@ -175,13 +180,14 @@ if ($path === '/') {
 if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
     $discipline = $m[1];
     $page = 'discipline';
-    $year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+    $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
     // Tehtud: See tuleb ümber teha RankCalculatorisse!
     $calc = new Eol\Edetabel\RankCalculator($pdo);
     $rankings = $calc->computeForAlakoodYear($discipline, $year);
 
     $disciplineName = $edetabliSeadedByYear[$year][$discipline]['nimetus'] ?? $discipline;
-    $viewData = ['discipline' => $discipline, 'disciplineName' => $disciplineName, 'rankings' => $rankings ?? []];
+    $disciplineIcon = $disciplineIcons[$discipline] ?? '';
+    $viewData = ['discipline' => $discipline, 'disciplineName' => $disciplineName, 'disciplineIcon' => $disciplineIcon, 'rankings' => $rankings ?? []];
     include __DIR__ . '/templates/discipline.php';
     exit;
 }
@@ -189,6 +195,16 @@ if (preg_match('#^/discipline/([A-Z]{1,3})$#', $path, $m)) {
 if (preg_match('#^/athlete/(\d+)$#', $path, $m)) {
     $iofId = $m[1];
     $page = 'athlete';
+    $selectedEventorIds = [];
+    if (!empty($_GET['eventorIds'])) {
+        $rawEventorIds = explode(',', (string) $_GET['eventorIds']);
+        foreach ($rawEventorIds as $eventorId) {
+            $normalizedId = trim($eventorId);
+            if ($normalizedId !== '') {
+                $selectedEventorIds[$normalizedId] = true;
+            }
+        }
+    }
     // Tehtud: Loeme jooksja andmed EOLi tabelist eolkoodid ja iofrunners kui seal ei ole'
     $stmt = $pdo->prepare("SELECT 
             COALESCE(eolk.EESNIMI, r.firstname) AS firstname,
@@ -209,19 +225,24 @@ if (preg_match('#^/athlete/(\d+)$#', $path, $m)) {
             'clubname' => mb_convert_encoding(($athleteData['clubname'] ?? ''), "ISO-8859-1", "UTF-8"),
             'birthdate' => $athleteData['birthdate'] ?? '',
             'photoUrl' => $athleteData['photo'] ?? '',
-            'age' => $athleteData['birthdate'] && $athleteData['birthdate']!='0000-00-00' ? (int)(date('Y') - (int)substr($athleteData['birthdate'], 0, 4)) : ''
+            'age' => $athleteData['birthdate'] && $athleteData['birthdate'] != '0000-00-00' ? (int) (date('Y') - (int) substr($athleteData['birthdate'], 0, 4)) : ''
         ];
+    } else {
+        http_response_code(404);
+        header('Content-Type: text/plain');
+        echo "Not found\n";
+        exit;
     }
     $stmt2 = $pdo->prepare('SELECT ir.iofId, e.eventorId, e.nimetus, e.alatunnus, e.kuupaev, ir.tulemus, ir.koht, ir.RankPoints, ir.`Group` as `group` FROM iofresults ir JOIN iofevents e ON e.eventorId = ir.eventorId  WHERE ir.iofId = :iofID ORDER BY e.kuupaev DESC');
     $stmt2->execute([':iofID' => $iofId]);
     $eventsAll = $stmt2->fetchAll();
     $events = [];
     foreach ($eventsAll as $ev) {
-        $id = (string)$ev['iofId'];
-        $events[] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null];
+        $eventorId = isset($ev['eventorId']) ? (string) $ev['eventorId'] : '';
+        $events[] = ['eventorId' => $ev['eventorId'] ?? null, 'alatunnus' => $ev['alatunnus'] ?? null, 'date' => $ev['kuupaev'], 'name' => $ev['nimetus'], 'result' => $ev['tulemus'], 'place' => $ev['koht'], 'points' => $ev['RankPoints'], 'group' => $ev['group'] ?? null, 'isSelected' => isset($selectedEventorIds[$eventorId])];
     }
 
-    $viewData = ['iofId' => $athlete['iofId'], 'athlete' => ($athlete ?? null), 'events' => $events ?? []];
+    $viewData = ['iofId' => $athlete['iofId'], 'athlete' => ($athlete ?? null), 'events' => $events ?? [], 'disciplineIcons' => $disciplineIcons ?? [], 'disciplineNames' => $disciplineNames ?? [], 'selectedEventorIds' => array_keys($selectedEventorIds)];
     include __DIR__ . '/templates/athlete.php';
     exit;
 }

@@ -90,9 +90,9 @@ class RankCalculator
                 'points' => $points,
             ];
             $byAthlete[$id]['iofId'] = (int)$row['iofId'];
-            $byAthlete[$id]['firstname'] = mb_convert_encoding($row['firstname'], "ISO-8859-1", "UTF-8");
-            $byAthlete[$id]['lastname'] = mb_convert_encoding($row['lastname'], "ISO-8859-1", "UTF-8");
-            $byAthlete[$id]['clubname'] = mb_convert_encoding($row['clubname'], "ISO-8859-1", "UTF-8");
+            $byAthlete[$id]['firstname'] = $row['firstname'];
+            $byAthlete[$id]['lastname'] = $row['lastname'];
+            $byAthlete[$id]['clubname'] = $row['clubname'];
             // map per-result Group into athlete-level sex/group; use first seen
             $byAthlete[$id]['group'] = $row['runnerGroup'];
             $byAthlete[$id]['birthdate'] = $row['birthdate'];;

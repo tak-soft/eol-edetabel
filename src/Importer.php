@@ -72,32 +72,32 @@ class Importer
 
             foreach ($items as $it) {
                 // Map fields from API
-                $eventId = $it['EventId'] ?? null;
-                $iofId = $it['IofId'] ?? null;
+                $eventId = $it['eventId'] ?? null;
+                $iofId = $it['iofId'] ?? null;
                 if (!$eventId || !$iofId) continue;
 
                 $stmtEvent->execute([
                     ':eventorId' => $eventId,
-                    ':kuupaev' => isset($it['EventDate']) ? substr($it['EventDate'], 0, 10) : null,
-                    ':nimetus' => $it['EventName'] ?? null,
-                    ':distants' => $it['Distance'] ?? null,
-                    ':riik' => $it['EventCountry'] ?? null,
-                    ':alatunnus' => $it['Discipline'] ?? null,
+                    ':kuupaev' => isset($it['eventDate']) ? substr($it['eventDate'], 0, 10) : null,
+                    ':nimetus' => $it['eventName'] ?? null,
+                    ':distants' => $it['distance'] ?? null,
+                    ':riik' => $it['eventCountry'] ?? null,
+                    ':alatunnus' => $it['discipline'] ?? null,
                 ]);
 
                 $stmtRunner->execute([
                     ':iofId' => $iofId,
-                    ':firstname' => $it['FirstName'] ?? null,
-                    ':lastname' => $it['LastName'] ?? null,
+                    ':firstname' => $it['firstName'] ?? null,
+                    ':lastname' => $it['lastName'] ?? null,
                 ]);
 
                 $stmtResult->execute([
                     ':eventorId' => $eventId,
                     ':iofId' => $iofId,
-                    ':tulemus' => $it['RaceTimeSeconds'] ?? null,
-                    ':koht' => $it['Position'] ?? null,
-                    ':RankPoints' => $it['RankPoints'] ?? null,
-                    ':group' => $it['Group'] ?? null,
+                    ':tulemus' => $it['raceTimeSeconds'] ?? null,
+                    ':koht' => $it['position'] ?? null,
+                    ':RankPoints' => $it['rankPoints'] ?? null,
+                    ':group' => $it['group'] ?? null,
                 ]);
                 $count++;
             }

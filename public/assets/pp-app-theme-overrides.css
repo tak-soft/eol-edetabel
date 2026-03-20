@@ -324,3 +324,10 @@ body {
 .athlete-result-discipline-icon {
   flex: 0 0 auto;
 }
+
+.icon-text {
+  display: flex;
+  align-items: flex-start; /* flex-end või center, kui soovid täpselt keskele */
+  gap: 0.5rem;
+  height: 2rem;
+}

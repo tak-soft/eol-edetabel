@@ -220,9 +220,9 @@ if (preg_match('#^/athlete/(\d+)$#', $path, $m)) {
         $athlete = [
             'iofId' => $iofId,
             'eolKood' => $athleteData['eolKood'] ?? '',
-            'firstname' => mb_convert_encoding(($athleteData['firstname'] ?? ''), "ISO-8859-1", "UTF-8"),
-            'lastname' => mb_convert_encoding(($athleteData['lastname'] ?? ''), "ISO-8859-1", "UTF-8"),
-            'clubname' => mb_convert_encoding(($athleteData['clubname'] ?? ''), "ISO-8859-1", "UTF-8"),
+            'firstname' => $athleteData['firstname'] ?? '',
+            'lastname' => $athleteData['lastname'] ?? '',
+            'clubname' => $athleteData['clubname'] ?? '',
             'birthdate' => $athleteData['birthdate'] ?? '',
             'photoUrl' => $athleteData['photo'] ?? '',
             'age' => $athleteData['birthdate'] && $athleteData['birthdate'] != '0000-00-00' ? (int) (date('Y') - (int) substr($athleteData['birthdate'], 0, 4)) : ''

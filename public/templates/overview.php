@@ -23,6 +23,8 @@
   <section class="app-title">
     <h1 class="app-title__heading">EOL Edetabel — <?php echo htmlspecialchars((string) $viewData['year']); ?></h1>
   </section>
+
+
   <nav class="nav-national-team">
     <?php
     // Use discipline names provided by controller (from edetabli_seaded) when available
@@ -36,12 +38,11 @@
     }
     ?>
   </nav>
-  <section class="container-xl">
-    <?php foreach ($disciplineIcons as $code => $icon): ?>
-      <?php $name = $disciplineNames[$code] ?? $code; ?>
-      <a class="menu-item menu-item-type-post_type" href="#<?php echo urlencode($code); ?>"><img src="/assets/<?php echo htmlspecialchars($icon); ?>"
-          alt="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></a>
-    <?php endforeach; ?>
+  <section class="container-xl icon-text">
+      <a class="menu-item menu-item-type-post_type icon-text" href="#F"><img src="/assets/oj_pikto.png" alt="Orienteerumisjooks">Orienteerumisjooks</a>
+      <a class="menu-item menu-item-type-post_type icon-text" href="#FS"><img src="/assets/oj_pikto.png" alt="Sprint">Sprint</a>
+      <a class="menu-item menu-item-type-post_type icon-text" href="#M"><img src="/assets/ro_pikto.png" alt="Rattaorienteerumine">RattaO</a>
+      <a class="menu-item menu-item-type-post_type icon-text" href="#S"><img src="/assets/so_pikto.png" alt="Suusaorienteerumine">SuusaO</a>
   </section>
 
   <div class="container-xl disciplines-grid">
